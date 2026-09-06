@@ -11,6 +11,7 @@ import {
   Zap,
   Lock,
 } from "lucide-react";
+import logoAsset from "../assets/aeropdf-logo.png.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -148,9 +149,11 @@ function AeroPDFStudio() {
       {/* Header */}
       <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary shadow-sm">
-            <FileDown className="h-5 w-5 text-primary-foreground" />
-          </div>
+          <img
+            src={logoAsset.url}
+            alt="AeroPDF Studio logo"
+            className="h-12 w-12 object-contain"
+          />
           <div>
             <p className="text-lg font-bold tracking-tight">AeroPDF Studio</p>
             <p className="text-xs text-muted-foreground">Free PDF Workspace</p>
