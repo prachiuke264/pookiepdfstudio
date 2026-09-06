@@ -6,7 +6,6 @@ import {
   Minimize2,
   Files,
   Image,
-  CloudUpload,
   X,
   ShieldCheck,
   Zap,
