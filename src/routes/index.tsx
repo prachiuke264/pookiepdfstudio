@@ -16,13 +16,13 @@ import logoAsset from "../assets/aeropdf-logo.png.asset.json";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "AeroPDF Studio — Free PDF Converter & Tools" },
+      { title: "PookiePDF Studio - 100% Free PDF Tools" },
       {
         name: "description",
         content:
-          "AeroPDF Studio is a free, frictionless PDF workspace. Convert, compress, merge, and transform files instantly — no sign-up, no paywalls.",
+          "PookiePDF Studio is a free, frictionless PDF workspace. Convert, compress, merge, and transform files instantly — no sign-up, no paywalls.",
       },
-      { property: "og:title", content: "AeroPDF Studio — Free PDF Converter & Tools" },
+      { property: "og:title", content: "PookiePDF Studio - 100% Free PDF Tools" },
       {
         property: "og:description",
         content:
