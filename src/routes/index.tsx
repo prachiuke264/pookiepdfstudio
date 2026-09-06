@@ -130,7 +130,7 @@ function AeroPDFStudio() {
       setConverting(false);
       setDone(true);
       // Simulated instant download of the converted file.
-      const base = files[0].name.replace(/\.[^.]+$/, "");
+      const base = files[0]!.name.replace(/\.[^.]+$/, "");
       const blob = new Blob(
         [`AeroPDF Studio — ${activeTool.title} output for ${files.map((f) => f.name).join(", ")}`],
         { type: "application/pdf" }
@@ -183,13 +183,22 @@ function AeroPDFStudio() {
 
         {/* Converter workspace */}
         <section
+          ref={workspaceRef}
           aria-label="PDF converter"
-          className="relative mx-auto max-w-3xl rounded-3xl border border-border bg-card p-6 shadow-[0_20px_60px_-20px_oklch(0.24_0.03_245/0.15)] sm:p-10"
+          className="relative mx-auto max-w-3xl scroll-mt-24 rounded-3xl border border-border bg-card p-6 shadow-[0_20px_60px_-20px_oklch(0.24_0.03_245/0.15)] sm:p-10"
         >
+          <div key={activeTool.id} className="mb-6 text-center">
+            <h2 className="text-2xl font-extrabold tracking-tight sm:text-3xl">
+              {activeTool.workspaceTitle}
+            </h2>
+            <p className="mt-1.5 text-sm text-muted-foreground">
+              {activeTool.workspaceDesc}
+            </p>
+          </div>
           <div
             role="button"
             tabIndex={0}
-            aria-label="Upload a file to convert"
+            aria-label={`Upload files for ${activeTool.title}`}
             onClick={() => inputRef.current?.click()}
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.key === " ") inputRef.current?.click();
@@ -202,7 +211,7 @@ function AeroPDFStudio() {
             onDrop={(e) => {
               e.preventDefault();
               setDragging(false);
-              acceptFile(e.dataTransfer.files?.[0]);
+              acceptFiles(e.dataTransfer.files);
             }}
             className={`flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed px-6 py-14 text-center backdrop-blur-md transition-all duration-200 ${
               dragging
@@ -211,20 +220,22 @@ function AeroPDFStudio() {
             }`}
           >
             <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-card shadow-sm">
-              <CloudUpload className="h-7 w-7 text-foreground/70" />
+              <activeTool.icon className="h-7 w-7 text-foreground/70" />
             </div>
-            <p className="text-lg font-semibold">
-              Drag &amp; drop your file here
-            </p>
+            <p className="text-lg font-semibold">{activeTool.dropText}</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              or <span className="font-medium underline underline-offset-2">browse your device</span> — PDF, DOCX, JPG, PNG up to 100&nbsp;MB
+              or <span className="font-medium underline underline-offset-2">browse your device</span> — {activeTool.dropHint}
             </p>
             <input
               ref={inputRef}
               type="file"
               className="hidden"
-              accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.webp"
-              onChange={(e) => acceptFile(e.target.files?.[0])}
+              accept={activeTool.accept}
+              multiple={activeTool.multiple}
+              onChange={(e) => {
+                acceptFiles(e.target.files);
+                e.target.value = "";
+              }}
             />
           </div>
 
