@@ -77,10 +77,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "AeroPDF Studio" },
+      { title: "PookiePDF Studio - 100% Free PDF Tools" },
       { name: "description", content: "Free, frictionless PDF converter and utility tools." },
-      { name: "author", content: "AeroPDF Studio" },
-      { property: "og:title", content: "AeroPDF Studio" },
+      { name: "author", content: "PookiePDF Studio" },
+      { property: "og:title", content: "PookiePDF Studio - 100% Free PDF Tools" },
       { property: "og:description", content: "Free, frictionless PDF converter and utility tools." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
