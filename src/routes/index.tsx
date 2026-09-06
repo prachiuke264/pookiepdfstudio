@@ -239,35 +239,42 @@ function AeroPDFStudio() {
             />
           </div>
 
-          {/* File indicator */}
-          {file && (
-            <div className="mt-5 flex items-center justify-between rounded-xl bg-secondary px-4 py-3">
-              <div className="flex min-w-0 items-center gap-3">
-                <FileText className="h-5 w-5 shrink-0 text-secondary-foreground" />
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-semibold">{file.name}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {formatSize(file.size)} · Ready to convert
-                  </p>
+          {/* File indicators */}
+          {files.length > 0 && (
+            <div className="mt-5 space-y-2">
+              {files.map((f, i) => (
+                <div
+                  key={`${f.name}-${i}`}
+                  className="flex items-center justify-between rounded-xl bg-secondary px-4 py-3"
+                >
+                  <div className="flex min-w-0 items-center gap-3">
+                    <FileText className="h-5 w-5 shrink-0 text-secondary-foreground" />
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold">{f.name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {formatSize(f.size)} · Ready to convert
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    aria-label={`Remove ${f.name}`}
+                    onClick={() => {
+                      setFiles((prev) => prev.filter((_, j) => j !== i));
+                      setDone(false);
+                    }}
+                    className="rounded-full p-1.5 text-muted-foreground transition-colors hover:bg-card hover:text-foreground"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
                 </div>
-              </div>
-              <button
-                aria-label="Remove file"
-                onClick={() => {
-                  setFile(null);
-                  setDone(false);
-                }}
-                className="rounded-full p-1.5 text-muted-foreground transition-colors hover:bg-card hover:text-foreground"
-              >
-                <X className="h-4 w-4" />
-              </button>
+              ))}
             </div>
           )}
 
           {/* Action */}
           <button
             onClick={handleConvert}
-            disabled={!file || converting}
+            disabled={files.length === 0 || converting}
             className="mt-6 w-full rounded-2xl bg-primary px-6 py-4 text-lg font-bold text-primary-foreground shadow-[0_0_35px_-5px_oklch(0.82_0.05_235/0.9)] transition-all duration-200 hover:shadow-[0_0_45px_-5px_oklch(0.82_0.05_235)] hover:brightness-105 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
           >
             {converting ? "Converting…" : "⚡ Convert Instantly (100% Free)"}
@@ -305,9 +312,14 @@ function AeroPDFStudio() {
           <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {TOOLS.map((tool) => (
               <button
-                key={tool.title}
-                onClick={() => inputRef.current?.click()}
-                className="group rounded-2xl border border-border bg-card p-6 text-left shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-primary hover:bg-primary/20 hover:shadow-md"
+                key={tool.id}
+                onClick={() => selectTool(tool)}
+                aria-pressed={activeTool.id === tool.id}
+                className={`group rounded-2xl border p-6 text-left shadow-sm transition-all duration-200 hover:scale-105 hover:shadow-md active:scale-95 ${
+                  activeTool.id === tool.id
+                    ? "border-primary bg-primary/25"
+                    : "border-border bg-card hover:border-primary hover:bg-primary/20"
+                }`}
               >
                 <div className="mb-4 flex items-center justify-between">
                   <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-secondary transition-colors group-hover:bg-card">
