@@ -97,37 +97,52 @@ function formatSize(bytes: number) {
 }
 
 function AeroPDFStudio() {
-  const [file, setFile] = useState<File | null>(null);
+  const [activeTool, setActiveTool] = useState(TOOLS[0]);
+  const [files, setFiles] = useState<File[]>([]);
   const [dragging, setDragging] = useState(false);
   const [converting, setConverting] = useState(false);
   const [done, setDone] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const workspaceRef = useRef<HTMLElement>(null);
 
-  const acceptFile = useCallback((f: File | undefined | null) => {
-    if (!f) return;
-    setFile(f);
+  const selectTool = useCallback((tool: (typeof TOOLS)[number]) => {
+    setActiveTool(tool);
+    setFiles([]);
     setDone(false);
+    workspaceRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
   }, []);
 
+  const acceptFiles = useCallback(
+    (incoming: FileList | File[] | null | undefined) => {
+      if (!incoming || incoming.length === 0) return;
+      const list = Array.from(incoming);
+      setFiles((prev) => (activeTool.multiple ? [...prev, ...list] : list.slice(0, 1)));
+      setDone(false);
+    },
+    [activeTool]
+  );
+
   const handleConvert = useCallback(() => {
-    if (!file || converting) return;
+    if (files.length === 0 || converting) return;
     setConverting(true);
     setDone(false);
     window.setTimeout(() => {
       setConverting(false);
       setDone(true);
       // Simulated instant download of the converted file.
-      const blob = new Blob([`AeroPDF Studio — converted output for ${file.name}`], {
-        type: "application/pdf",
-      });
+      const base = files[0].name.replace(/\.[^.]+$/, "");
+      const blob = new Blob(
+        [`AeroPDF Studio — ${activeTool.title} output for ${files.map((f) => f.name).join(", ")}`],
+        { type: "application/pdf" }
+      );
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = file.name.replace(/\.[^.]+$/, "") + "-converted.pdf";
+      a.download = `${base}-converted.pdf`;
       a.click();
       URL.revokeObjectURL(url);
     }, 500);
-  }, [file, converting]);
+  }, [files, converting, activeTool]);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
