@@ -97,7 +97,7 @@ function formatSize(bytes: number) {
 }
 
 function AeroPDFStudio() {
-  const [activeTool, setActiveTool] = useState(TOOLS[0]);
+  const [activeTool, setActiveTool] = useState<(typeof TOOLS)[number]>(TOOLS[0]!);
   const [files, setFiles] = useState<File[]>([]);
   const [dragging, setDragging] = useState(false);
   const [converting, setConverting] = useState(false);
