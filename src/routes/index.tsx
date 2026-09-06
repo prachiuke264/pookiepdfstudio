@@ -6,7 +6,6 @@ import {
   Minimize2,
   Files,
   Image,
-  CloudUpload,
   X,
   ShieldCheck,
   Zap,
@@ -37,28 +36,56 @@ export const Route = createFileRoute("/")({
 
 const TOOLS = [
   {
+    id: "pdf-to-word",
     icon: FileText,
     title: "PDF to Word",
     desc: "Turn any PDF into an editable .docx document in seconds.",
     tag: "Popular",
+    workspaceTitle: "PDF to Word Converter",
+    workspaceDesc: "Upload a PDF and get a fully editable Word document back.",
+    dropText: "Drag & drop your PDF here",
+    dropHint: "PDF files up to 100 MB",
+    accept: ".pdf",
+    multiple: false,
   },
   {
+    id: "compress-pdf",
     icon: Minimize2,
     title: "Compress PDF",
     desc: "Shrink file size up to 90% without visible quality loss.",
     tag: "Fast",
+    workspaceTitle: "Compress PDF",
+    workspaceDesc: "Upload a PDF and we'll shrink it while keeping it crisp.",
+    dropText: "Drag & drop the PDF to compress",
+    dropHint: "PDF files up to 100 MB",
+    accept: ".pdf",
+    multiple: false,
   },
   {
+    id: "merge-pdf",
     icon: Files,
     title: "Merge PDF",
     desc: "Combine multiple PDFs into one clean, ordered document.",
     tag: "Easy",
+    workspaceTitle: "Merge PDF Tools — Upload Multiple Files",
+    workspaceDesc: "Drop two or more PDFs and we'll combine them into one file.",
+    dropText: "Drag & drop multiple PDFs here",
+    dropHint: "Select several PDF files at once",
+    accept: ".pdf",
+    multiple: true,
   },
   {
+    id: "image-to-pdf",
     icon: Image,
     title: "Image to PDF",
     desc: "Convert JPG, PNG, and WebP images into polished PDFs.",
     tag: "New",
+    workspaceTitle: "Image to PDF Converter",
+    workspaceDesc: "Upload images and turn them into a clean, shareable PDF.",
+    dropText: "Drag & drop your images here",
+    dropHint: "JPG, PNG, or WebP — multiple allowed",
+    accept: ".jpg,.jpeg,.png,.webp",
+    multiple: true,
   },
 ];
 
@@ -69,37 +96,52 @@ function formatSize(bytes: number) {
 }
 
 function AeroPDFStudio() {
-  const [file, setFile] = useState<File | null>(null);
+  const [activeTool, setActiveTool] = useState<(typeof TOOLS)[number]>(TOOLS[0]!);
+  const [files, setFiles] = useState<File[]>([]);
   const [dragging, setDragging] = useState(false);
   const [converting, setConverting] = useState(false);
   const [done, setDone] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const workspaceRef = useRef<HTMLElement>(null);
 
-  const acceptFile = useCallback((f: File | undefined | null) => {
-    if (!f) return;
-    setFile(f);
+  const selectTool = useCallback((tool: (typeof TOOLS)[number]) => {
+    setActiveTool(tool);
+    setFiles([]);
     setDone(false);
+    workspaceRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
   }, []);
 
+  const acceptFiles = useCallback(
+    (incoming: FileList | File[] | null | undefined) => {
+      if (!incoming || incoming.length === 0) return;
+      const list = Array.from(incoming);
+      setFiles((prev) => (activeTool.multiple ? [...prev, ...list] : list.slice(0, 1)));
+      setDone(false);
+    },
+    [activeTool]
+  );
+
   const handleConvert = useCallback(() => {
-    if (!file || converting) return;
+    if (files.length === 0 || converting) return;
     setConverting(true);
     setDone(false);
     window.setTimeout(() => {
       setConverting(false);
       setDone(true);
       // Simulated instant download of the converted file.
-      const blob = new Blob([`AeroPDF Studio — converted output for ${file.name}`], {
-        type: "application/pdf",
-      });
+      const base = files[0]!.name.replace(/\.[^.]+$/, "");
+      const blob = new Blob(
+        [`AeroPDF Studio — ${activeTool.title} output for ${files.map((f) => f.name).join(", ")}`],
+        { type: "application/pdf" }
+      );
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = file.name.replace(/\.[^.]+$/, "") + "-converted.pdf";
+      a.download = `${base}-converted.pdf`;
       a.click();
       URL.revokeObjectURL(url);
     }, 500);
-  }, [file, converting]);
+  }, [files, converting, activeTool]);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -140,13 +182,22 @@ function AeroPDFStudio() {
 
         {/* Converter workspace */}
         <section
+          ref={workspaceRef}
           aria-label="PDF converter"
-          className="relative mx-auto max-w-3xl rounded-3xl border border-border bg-card p-6 shadow-[0_20px_60px_-20px_oklch(0.24_0.03_245/0.15)] sm:p-10"
+          className="relative mx-auto max-w-3xl scroll-mt-24 rounded-3xl border border-border bg-card p-6 shadow-[0_20px_60px_-20px_oklch(0.24_0.03_245/0.15)] sm:p-10"
         >
+          <div key={activeTool.id} className="mb-6 text-center">
+            <h2 className="text-2xl font-extrabold tracking-tight sm:text-3xl">
+              {activeTool.workspaceTitle}
+            </h2>
+            <p className="mt-1.5 text-sm text-muted-foreground">
+              {activeTool.workspaceDesc}
+            </p>
+          </div>
           <div
             role="button"
             tabIndex={0}
-            aria-label="Upload a file to convert"
+            aria-label={`Upload files for ${activeTool.title}`}
             onClick={() => inputRef.current?.click()}
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.key === " ") inputRef.current?.click();
@@ -159,7 +210,7 @@ function AeroPDFStudio() {
             onDrop={(e) => {
               e.preventDefault();
               setDragging(false);
-              acceptFile(e.dataTransfer.files?.[0]);
+              acceptFiles(e.dataTransfer.files);
             }}
             className={`flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed px-6 py-14 text-center backdrop-blur-md transition-all duration-200 ${
               dragging
@@ -168,52 +219,61 @@ function AeroPDFStudio() {
             }`}
           >
             <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-card shadow-sm">
-              <CloudUpload className="h-7 w-7 text-foreground/70" />
+              <activeTool.icon className="h-7 w-7 text-foreground/70" />
             </div>
-            <p className="text-lg font-semibold">
-              Drag &amp; drop your file here
-            </p>
+            <p className="text-lg font-semibold">{activeTool.dropText}</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              or <span className="font-medium underline underline-offset-2">browse your device</span> — PDF, DOCX, JPG, PNG up to 100&nbsp;MB
+              or <span className="font-medium underline underline-offset-2">browse your device</span> — {activeTool.dropHint}
             </p>
             <input
               ref={inputRef}
               type="file"
               className="hidden"
-              accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.webp"
-              onChange={(e) => acceptFile(e.target.files?.[0])}
+              accept={activeTool.accept}
+              multiple={activeTool.multiple}
+              onChange={(e) => {
+                acceptFiles(e.target.files);
+                e.target.value = "";
+              }}
             />
           </div>
 
-          {/* File indicator */}
-          {file && (
-            <div className="mt-5 flex items-center justify-between rounded-xl bg-secondary px-4 py-3">
-              <div className="flex min-w-0 items-center gap-3">
-                <FileText className="h-5 w-5 shrink-0 text-secondary-foreground" />
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-semibold">{file.name}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {formatSize(file.size)} · Ready to convert
-                  </p>
+          {/* File indicators */}
+          {files.length > 0 && (
+            <div className="mt-5 space-y-2">
+              {files.map((f, i) => (
+                <div
+                  key={`${f.name}-${i}`}
+                  className="flex items-center justify-between rounded-xl bg-secondary px-4 py-3"
+                >
+                  <div className="flex min-w-0 items-center gap-3">
+                    <FileText className="h-5 w-5 shrink-0 text-secondary-foreground" />
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold">{f.name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {formatSize(f.size)} · Ready to convert
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    aria-label={`Remove ${f.name}`}
+                    onClick={() => {
+                      setFiles((prev) => prev.filter((_, j) => j !== i));
+                      setDone(false);
+                    }}
+                    className="rounded-full p-1.5 text-muted-foreground transition-colors hover:bg-card hover:text-foreground"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
                 </div>
-              </div>
-              <button
-                aria-label="Remove file"
-                onClick={() => {
-                  setFile(null);
-                  setDone(false);
-                }}
-                className="rounded-full p-1.5 text-muted-foreground transition-colors hover:bg-card hover:text-foreground"
-              >
-                <X className="h-4 w-4" />
-              </button>
+              ))}
             </div>
           )}
 
           {/* Action */}
           <button
             onClick={handleConvert}
-            disabled={!file || converting}
+            disabled={files.length === 0 || converting}
             className="mt-6 w-full rounded-2xl bg-primary px-6 py-4 text-lg font-bold text-primary-foreground shadow-[0_0_35px_-5px_oklch(0.82_0.05_235/0.9)] transition-all duration-200 hover:shadow-[0_0_45px_-5px_oklch(0.82_0.05_235)] hover:brightness-105 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
           >
             {converting ? "Converting…" : "⚡ Convert Instantly (100% Free)"}
@@ -251,9 +311,14 @@ function AeroPDFStudio() {
           <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {TOOLS.map((tool) => (
               <button
-                key={tool.title}
-                onClick={() => inputRef.current?.click()}
-                className="group rounded-2xl border border-border bg-card p-6 text-left shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-primary hover:bg-primary/20 hover:shadow-md"
+                key={tool.id}
+                onClick={() => selectTool(tool)}
+                aria-pressed={activeTool.id === tool.id}
+                className={`group rounded-2xl border p-6 text-left shadow-sm transition-all duration-200 hover:scale-105 hover:shadow-md active:scale-95 ${
+                  activeTool.id === tool.id
+                    ? "border-primary bg-primary/25"
+                    : "border-border bg-card hover:border-primary hover:bg-primary/20"
+                }`}
               >
                 <div className="mb-4 flex items-center justify-between">
                   <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-secondary transition-colors group-hover:bg-card">
