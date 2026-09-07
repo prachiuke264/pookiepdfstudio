@@ -132,7 +132,7 @@ function AeroPDFStudio() {
       // Simulated instant download of the converted file.
       const base = files[0]!.name.replace(/\.[^.]+$/, "");
       const blob = new Blob(
-        [`AeroPDF Studio — ${activeTool.title} output for ${files.map((f) => f.name).join(", ")}`],
+        [`PookiePDF Studio — ${activeTool.title} output for ${files.map((f) => f.name).join(", ")}`],
         { type: "application/pdf" }
       );
       const url = URL.createObjectURL(blob);
@@ -151,11 +151,11 @@ function AeroPDFStudio() {
         <div className="flex items-center gap-3">
           <img
             src={logoAsset.url}
-            alt="AeroPDF Studio logo"
+            alt="PookiePDF Studio logo"
             className="h-12 w-12 object-contain"
           />
           <div>
-            <p className="text-lg font-bold tracking-tight">AeroPDF Studio</p>
+            <p className="text-lg font-bold tracking-tight">PookiePDF Studio</p>
             <p className="text-xs text-muted-foreground">Free PDF Workspace</p>
           </div>
         </div>
@@ -178,8 +178,7 @@ function AeroPDFStudio() {
             <span className="text-muted-foreground">Beautifully simple.</span>
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-base text-muted-foreground">
-            Drop a file, click once, done. No accounts, no email walls, no
-            subscriptions — just fast, clean conversions.
+            No sign-up · No paywall · 100% Free Forever
           </p>
         </section>
 
@@ -353,7 +352,7 @@ function AeroPDFStudio() {
 
       {/* Footer */}
       <footer className="border-t border-border py-8 text-center text-xs text-muted-foreground">
-        AeroPDF Studio — free PDF tools, no strings attached.
+        PookiePDF Studio — free PDF tools, no strings attached.
       </footer>
     </div>
   );
