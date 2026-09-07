@@ -178,8 +178,7 @@ function AeroPDFStudio() {
             <span className="text-muted-foreground">Beautifully simple.</span>
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-base text-muted-foreground">
-            Drop a file, click once, done. No accounts, no email walls, no
-            subscriptions — just fast, clean conversions.
+            No sign-up · No paywall · 100% Free Forever
           </p>
         </section>
 
