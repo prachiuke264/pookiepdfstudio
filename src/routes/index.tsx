@@ -123,6 +123,8 @@ function AeroPDFStudio() {
     setActiveTool(tool);
     setFiles([]);
     setDone(false);
+    setError(null);
+    setResult(null);
     workspaceRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
   }, []);
 
@@ -132,31 +134,49 @@ function AeroPDFStudio() {
       const list = Array.from(incoming);
       setFiles((prev) => (activeTool.multiple ? [...prev, ...list] : list.slice(0, 1)));
       setDone(false);
+      setError(null);
+      setResult(null);
     },
     [activeTool]
   );
 
-  const handleConvert = useCallback(() => {
+  const handleConvert = useCallback(async () => {
     if (files.length === 0 || converting) return;
     setConverting(true);
     setDone(false);
-    window.setTimeout(() => {
-      setConverting(false);
+    setError(null);
+    setResult(null);
+    const base = files[0]!.name.replace(/\.[^.]+$/, "");
+    try {
+      if (activeTool.id === "compress-pdf") {
+        const before = files[0]!.size;
+        const bytes = await compressPdf(files[0]!, level, targetReduction);
+        downloadBytes(bytes, `${base}-compressed.pdf`, "application/pdf");
+        setResult({ before, after: bytes.byteLength });
+      } else if (activeTool.id === "merge-pdf") {
+        const bytes = await mergePdfs(files);
+        downloadBytes(bytes, `merged.pdf`, "application/pdf");
+      } else if (activeTool.id === "image-to-pdf") {
+        const bytes = await imagesToPdf(files);
+        downloadBytes(bytes, `${base}.pdf`, "application/pdf");
+      } else {
+        const text = await pdfToText(files[0]!);
+        downloadBytes(
+          textToRtfBytes(text || "(No selectable text found in this PDF.)"),
+          `${base}.doc`,
+          "application/msword"
+        );
+        await normalizePdf(files[0]!);
+      }
       setDone(true);
-      // Simulated instant download of the converted file.
-      const base = files[0]!.name.replace(/\.[^.]+$/, "");
-      const blob = new Blob(
-        [`PookiePDF Studio — ${activeTool.title} output for ${files.map((f) => f.name).join(", ")}`],
-        { type: "application/pdf" }
+    } catch {
+      setError(
+        "We couldn't process that file — it may be password-protected or damaged."
       );
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${base}-converted.pdf`;
-      a.click();
-      URL.revokeObjectURL(url);
-    }, 500);
-  }, [files, converting, activeTool]);
+    } finally {
+      setConverting(false);
+    }
+  }, [files, converting, activeTool, level, targetReduction]);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
