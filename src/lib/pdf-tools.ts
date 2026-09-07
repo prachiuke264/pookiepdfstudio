@@ -19,7 +19,8 @@ function stripMetadata(pdf: PDFDocument) {
  */
 export async function compressPdf(
   file: File,
-  level: CompressionLevel
+  level: CompressionLevel,
+  targetReduction = 50
 ): Promise<Uint8Array> {
   const bytes = new Uint8Array(await file.arrayBuffer());
   const src = await PDFDocument.load(bytes, { ignoreEncryption: true });
@@ -40,11 +41,57 @@ export async function compressPdf(
 
   stripMetadata(out);
 
-  return out.save({
+  const lossless = await out.save({
     useObjectStreams: true,
     addDefaultPage: false,
     objectsPerTick: 200,
   });
+
+  if (level === "low") return lossless;
+
+  // Deeper compression: re-render pages as downscaled JPEG images.
+  const aggression = Math.min(0.95, Math.max(0.1, targetReduction / 100));
+  const quality = Math.max(0.35, 0.9 - aggression * 0.55);
+  const scale = Math.max(0.6, 1.6 - aggression * 1.0);
+  try {
+    const raster = await rasterizePdf(file, scale, quality);
+    return raster.byteLength < lossless.byteLength ? raster : lossless;
+  } catch {
+    return lossless;
+  }
+}
+
+async function rasterizePdf(file: File, scale: number, quality: number) {
+  const pdfjs = await loadPdfjs();
+  const doc = await pdfjs.getDocument({ data: new Uint8Array(await file.arrayBuffer()) })
+    .promise;
+  const out = await PDFDocument.create();
+  for (let i = 1; i <= doc.numPages; i++) {
+    const page = await doc.getPage(i);
+    const viewport = page.getViewport({ scale });
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.floor(viewport.width));
+    canvas.height = Math.max(1, Math.floor(viewport.height));
+    const ctx = canvas.getContext("2d")!;
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    await page.render({ canvas, canvasContext: ctx, viewport } as never).promise;
+    const blob: Blob = await new Promise((res) =>
+      canvas.toBlob((b) => res(b!), "image/jpeg", quality)
+    );
+    const img = await out.embedJpg(new Uint8Array(await blob.arrayBuffer()));
+    const pdfPage = out.addPage([canvas.width, canvas.height]);
+    pdfPage.drawImage(img, { x: 0, y: 0, width: canvas.width, height: canvas.height });
+  }
+  stripMetadata(out);
+  return out.save({ useObjectStreams: true });
+}
+
+async function loadPdfjs() {
+  const pdfjs = await import("pdfjs-dist");
+  const workerUrl = (await import("pdfjs-dist/build/pdf.worker.min.mjs?url")).default;
+  pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
+  return pdfjs;
 }
 
 export async function mergePdfs(files: File[]): Promise<Uint8Array> {
