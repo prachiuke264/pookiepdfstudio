@@ -132,7 +132,7 @@ function AeroPDFStudio() {
       // Simulated instant download of the converted file.
       const base = files[0]!.name.replace(/\.[^.]+$/, "");
       const blob = new Blob(
-        [`AeroPDF Studio — ${activeTool.title} output for ${files.map((f) => f.name).join(", ")}`],
+        [`PookiePDF Studio — ${activeTool.title} output for ${files.map((f) => f.name).join(", ")}`],
         { type: "application/pdf" }
       );
       const url = URL.createObjectURL(blob);
@@ -151,11 +151,11 @@ function AeroPDFStudio() {
         <div className="flex items-center gap-3">
           <img
             src={logoAsset.url}
-            alt="AeroPDF Studio logo"
+            alt="PookiePDF Studio logo"
             className="h-12 w-12 object-contain"
           />
           <div>
-            <p className="text-lg font-bold tracking-tight">AeroPDF Studio</p>
+            <p className="text-lg font-bold tracking-tight">PookiePDF Studio</p>
             <p className="text-xs text-muted-foreground">Free PDF Workspace</p>
           </div>
         </div>
@@ -353,7 +353,7 @@ function AeroPDFStudio() {
 
       {/* Footer */}
       <footer className="border-t border-border py-8 text-center text-xs text-muted-foreground">
-        AeroPDF Studio — free PDF tools, no strings attached.
+        PookiePDF Studio — free PDF tools, no strings attached.
       </footer>
     </div>
   );
