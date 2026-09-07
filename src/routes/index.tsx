@@ -12,6 +12,16 @@ import {
   Lock,
 } from "lucide-react";
 import logoAsset from "../assets/aeropdf-logo.png.asset.json";
+import {
+  compressPdf,
+  downloadBytes,
+  imagesToPdf,
+  mergePdfs,
+  normalizePdf,
+  pdfToText,
+  textToRtfBytes,
+  type CompressionLevel,
+} from "@/lib/pdf-tools";
 
 export const Route = createFileRoute("/")({
   head: () => ({
