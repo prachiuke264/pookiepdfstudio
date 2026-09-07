@@ -12,6 +12,16 @@ import {
   Lock,
 } from "lucide-react";
 import logoAsset from "../assets/aeropdf-logo.png.asset.json";
+import {
+  compressPdf,
+  downloadBytes,
+  imagesToPdf,
+  mergePdfs,
+  normalizePdf,
+  pdfToText,
+  textToRtfBytes,
+  type CompressionLevel,
+} from "@/lib/pdf-tools";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -102,6 +112,10 @@ function AeroPDFStudio() {
   const [dragging, setDragging] = useState(false);
   const [converting, setConverting] = useState(false);
   const [done, setDone] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [level, setLevel] = useState<CompressionLevel>("medium");
+  const [targetReduction, setTargetReduction] = useState(50);
+  const [result, setResult] = useState<{ before: number; after: number } | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const workspaceRef = useRef<HTMLElement>(null);
 
@@ -109,6 +123,8 @@ function AeroPDFStudio() {
     setActiveTool(tool);
     setFiles([]);
     setDone(false);
+    setError(null);
+    setResult(null);
     workspaceRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
   }, []);
 
@@ -118,31 +134,49 @@ function AeroPDFStudio() {
       const list = Array.from(incoming);
       setFiles((prev) => (activeTool.multiple ? [...prev, ...list] : list.slice(0, 1)));
       setDone(false);
+      setError(null);
+      setResult(null);
     },
     [activeTool]
   );
 
-  const handleConvert = useCallback(() => {
+  const handleConvert = useCallback(async () => {
     if (files.length === 0 || converting) return;
     setConverting(true);
     setDone(false);
-    window.setTimeout(() => {
-      setConverting(false);
+    setError(null);
+    setResult(null);
+    const base = files[0]!.name.replace(/\.[^.]+$/, "");
+    try {
+      if (activeTool.id === "compress-pdf") {
+        const before = files[0]!.size;
+        const bytes = await compressPdf(files[0]!, level, targetReduction);
+        downloadBytes(bytes, `${base}-compressed.pdf`, "application/pdf");
+        setResult({ before, after: bytes.byteLength });
+      } else if (activeTool.id === "merge-pdf") {
+        const bytes = await mergePdfs(files);
+        downloadBytes(bytes, `merged.pdf`, "application/pdf");
+      } else if (activeTool.id === "image-to-pdf") {
+        const bytes = await imagesToPdf(files);
+        downloadBytes(bytes, `${base}.pdf`, "application/pdf");
+      } else {
+        const text = await pdfToText(files[0]!);
+        downloadBytes(
+          textToRtfBytes(text || "(No selectable text found in this PDF.)"),
+          `${base}.doc`,
+          "application/msword"
+        );
+        await normalizePdf(files[0]!);
+      }
       setDone(true);
-      // Simulated instant download of the converted file.
-      const base = files[0]!.name.replace(/\.[^.]+$/, "");
-      const blob = new Blob(
-        [`PookiePDF Studio — ${activeTool.title} output for ${files.map((f) => f.name).join(", ")}`],
-        { type: "application/pdf" }
+    } catch {
+      setError(
+        "We couldn't process that file — it may be password-protected or damaged."
       );
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${base}-converted.pdf`;
-      a.click();
-      URL.revokeObjectURL(url);
-    }, 500);
-  }, [files, converting, activeTool]);
+    } finally {
+      setConverting(false);
+    }
+  }, [files, converting, activeTool, level, targetReduction]);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -272,6 +306,70 @@ function AeroPDFStudio() {
             </div>
           )}
 
+          {/* Compression controls */}
+          {activeTool.id === "compress-pdf" && (
+            <div className="mt-6 rounded-2xl border border-border bg-secondary/40 p-5">
+              <p className="text-sm font-bold text-[#2C2524]">Compression level</p>
+              <div className="mt-3 grid gap-2 sm:grid-cols-3">
+                {(
+                  [
+                    { id: "low", label: "Low", hint: "High quality" },
+                    { id: "medium", label: "Medium", hint: "Recommended" },
+                    { id: "high", label: "High", hint: "Smallest size" },
+                  ] as const
+                ).map((opt) => (
+                  <button
+                    key={opt.id}
+                    onClick={() => setLevel(opt.id)}
+                    aria-pressed={level === opt.id}
+                    className={`rounded-xl border px-4 py-3 text-left transition-all duration-200 hover:scale-[1.02] active:scale-95 ${
+                      level === opt.id
+                        ? "border-primary bg-primary/40"
+                        : "border-border bg-card hover:border-primary"
+                    }`}
+                  >
+                    <span className="block text-sm font-bold text-[#2C2524]">
+                      {opt.label}
+                    </span>
+                    <span className="block text-xs text-muted-foreground">
+                      {opt.hint}
+                    </span>
+                  </button>
+                ))}
+              </div>
+
+              <div className="mt-5">
+                <div className="flex items-center justify-between">
+                  <label
+                    htmlFor="target-reduction"
+                    className="text-sm font-bold text-[#2C2524]"
+                  >
+                    Target size reduction
+                  </label>
+                  <span className="rounded-full bg-primary px-3 py-1 text-xs font-bold text-primary-foreground">
+                    {targetReduction}%
+                  </span>
+                </div>
+                <input
+                  id="target-reduction"
+                  type="range"
+                  min={10}
+                  max={90}
+                  step={5}
+                  value={targetReduction}
+                  disabled={level === "low"}
+                  onChange={(e) => setTargetReduction(Number(e.target.value))}
+                  className="mt-3 w-full accent-[#2C3539] disabled:opacity-40"
+                />
+                <p className="mt-2 text-xs text-muted-foreground">
+                  {level === "low"
+                    ? "Low keeps every page lossless, so the target slider is off."
+                    : "Higher targets mean stronger page downscaling. Actual savings depend on the file."}
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Action */}
           <button
             onClick={handleConvert}
@@ -284,7 +382,18 @@ function AeroPDFStudio() {
           {done && (
             <p className="mt-4 flex items-center justify-center gap-2 text-sm font-medium text-foreground/80">
               <ShieldCheck className="h-4 w-4" />
-              Done — your converted file has downloaded.
+              {result
+                ? `Done — ${formatSize(result.before)} → ${formatSize(result.after)} (${Math.max(
+                    0,
+                    Math.round((1 - result.after / result.before) * 100)
+                  )}% smaller). Your PDF has downloaded.`
+                : "Done — your converted file has downloaded."}
+            </p>
+          )}
+
+          {error && (
+            <p className="mt-4 text-center text-sm font-medium text-destructive">
+              {error}
             </p>
           )}
         </section>
