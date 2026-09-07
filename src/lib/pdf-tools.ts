@@ -1,4 +1,4 @@
-import { PDFDocument } from "pdf-lib";
+import { PDFDocument, PDFName } from "pdf-lib";
 
 export type CompressionLevel = "low" | "medium" | "high";
 
@@ -29,11 +29,11 @@ export async function compressPdf(
   for (const page of pages) {
     if (level !== "low") {
       // remove interactive/annotation overhead
-      page.node.delete((await import("pdf-lib")).PDFName.of("Annots"));
+      page.node.delete(PDFName.of("Annots"));
     }
     if (level === "high") {
-      page.node.delete((await import("pdf-lib")).PDFName.of("StructParents"));
-      page.node.delete((await import("pdf-lib")).PDFName.of("Metadata"));
+      page.node.delete(PDFName.of("StructParents"));
+      page.node.delete(PDFName.of("Metadata"));
     }
     out.addPage(page);
   }
@@ -84,6 +84,25 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
     page.drawImage(img, { x: 0, y: 0, width, height });
   }
   return out.save({ useObjectStreams: true });
+}
+
+export async function pdfToText(file: File): Promise<string> {
+  const pdfjs = await import("pdfjs-dist");
+  const workerUrl = (await import("pdfjs-dist/build/pdf.worker.min.mjs?url")).default;
+  pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
+  const doc = await pdfjs.getDocument({ data: new Uint8Array(await file.arrayBuffer()) })
+    .promise;
+  let text = "";
+  for (let i = 1; i <= doc.numPages; i++) {
+    const page = await doc.getPage(i);
+    const content = await page.getTextContent();
+    text +=
+      content.items
+        .map((item) => ("str" in item ? item.str : ""))
+        .join(" ")
+        .replace(/\s+/g, " ") + "\n\n";
+  }
+  return text.trim();
 }
 
 /** Produces a real PDF copy for tools that only normalise the document. */
