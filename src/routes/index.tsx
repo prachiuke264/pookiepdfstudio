@@ -382,7 +382,18 @@ function AeroPDFStudio() {
           {done && (
             <p className="mt-4 flex items-center justify-center gap-2 text-sm font-medium text-foreground/80">
               <ShieldCheck className="h-4 w-4" />
-              Done — your converted file has downloaded.
+              {result
+                ? `Done — ${formatSize(result.before)} → ${formatSize(result.after)} (${Math.max(
+                    0,
+                    Math.round((1 - result.after / result.before) * 100)
+                  )}% smaller). Your PDF has downloaded.`
+                : "Done — your converted file has downloaded."}
+            </p>
+          )}
+
+          {error && (
+            <p className="mt-4 text-center text-sm font-medium text-destructive">
+              {error}
             </p>
           )}
         </section>
