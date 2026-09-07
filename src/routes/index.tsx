@@ -306,6 +306,70 @@ function AeroPDFStudio() {
             </div>
           )}
 
+          {/* Compression controls */}
+          {activeTool.id === "compress-pdf" && (
+            <div className="mt-6 rounded-2xl border border-border bg-secondary/40 p-5">
+              <p className="text-sm font-bold text-[#2C2524]">Compression level</p>
+              <div className="mt-3 grid gap-2 sm:grid-cols-3">
+                {(
+                  [
+                    { id: "low", label: "Low", hint: "High quality" },
+                    { id: "medium", label: "Medium", hint: "Recommended" },
+                    { id: "high", label: "High", hint: "Smallest size" },
+                  ] as const
+                ).map((opt) => (
+                  <button
+                    key={opt.id}
+                    onClick={() => setLevel(opt.id)}
+                    aria-pressed={level === opt.id}
+                    className={`rounded-xl border px-4 py-3 text-left transition-all duration-200 hover:scale-[1.02] active:scale-95 ${
+                      level === opt.id
+                        ? "border-primary bg-primary/40"
+                        : "border-border bg-card hover:border-primary"
+                    }`}
+                  >
+                    <span className="block text-sm font-bold text-[#2C2524]">
+                      {opt.label}
+                    </span>
+                    <span className="block text-xs text-muted-foreground">
+                      {opt.hint}
+                    </span>
+                  </button>
+                ))}
+              </div>
+
+              <div className="mt-5">
+                <div className="flex items-center justify-between">
+                  <label
+                    htmlFor="target-reduction"
+                    className="text-sm font-bold text-[#2C2524]"
+                  >
+                    Target size reduction
+                  </label>
+                  <span className="rounded-full bg-primary px-3 py-1 text-xs font-bold text-primary-foreground">
+                    {targetReduction}%
+                  </span>
+                </div>
+                <input
+                  id="target-reduction"
+                  type="range"
+                  min={10}
+                  max={90}
+                  step={5}
+                  value={targetReduction}
+                  disabled={level === "low"}
+                  onChange={(e) => setTargetReduction(Number(e.target.value))}
+                  className="mt-3 w-full accent-[#2C3539] disabled:opacity-40"
+                />
+                <p className="mt-2 text-xs text-muted-foreground">
+                  {level === "low"
+                    ? "Low keeps every page lossless, so the target slider is off."
+                    : "Higher targets mean stronger page downscaling. Actual savings depend on the file."}
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Action */}
           <button
             onClick={handleConvert}
