@@ -134,9 +134,7 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
 }
 
 export async function pdfToText(file: File): Promise<string> {
-  const pdfjs = await import("pdfjs-dist");
-  const workerUrl = (await import("pdfjs-dist/build/pdf.worker.min.mjs?url")).default;
-  pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
+  const pdfjs = await loadPdfjs();
   const doc = await pdfjs.getDocument({ data: new Uint8Array(await file.arrayBuffer()) })
     .promise;
   let text = "";
