@@ -112,6 +112,10 @@ function AeroPDFStudio() {
   const [dragging, setDragging] = useState(false);
   const [converting, setConverting] = useState(false);
   const [done, setDone] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [level, setLevel] = useState<CompressionLevel>("medium");
+  const [targetReduction, setTargetReduction] = useState(50);
+  const [result, setResult] = useState<{ before: number; after: number } | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const workspaceRef = useRef<HTMLElement>(null);
 
