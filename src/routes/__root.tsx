@@ -92,6 +92,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { name: "robots", content: "index, follow, max-image-preview:large" },
       { name: "author", content: "PookiePDF Studio" },
+      { name: "google-site-verification", content: "d0DbqoqEyWRlG8FllcNMXBEPCfam3LkRnY3smtN__hk" },
       {
         property: "og:title",
         content: "PookiePDF Studio - 100% Free Online PDF Converter & PDF Editor",
