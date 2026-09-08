@@ -77,14 +77,43 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "PookiePDF Studio - 100% Free PDF Tools" },
-      { name: "description", content: "Free, frictionless PDF converter and utility tools." },
+      {
+        title: "PookiePDF Studio - 100% Free Online PDF Converter & PDF Editor",
+      },
+      {
+        name: "description",
+        content:
+          "PookiePDF Studio is a 100% free online PDF workspace. Compress PDF, Merge PDF, and Convert PDF to Word instantly with zero sign-ups, no registration, and no hidden paywalls.",
+      },
+      {
+        name: "keywords",
+        content:
+          "free PDF converter, PDF editor, compress PDF, merge PDF, PDF to Word, online PDF tools, free PDF tools, convert PDF, PDF compressor, image to PDF",
+      },
+      { name: "robots", content: "index, follow, max-image-preview:large" },
       { name: "author", content: "PookiePDF Studio" },
-      { property: "og:title", content: "PookiePDF Studio - 100% Free PDF Tools" },
-      { property: "og:description", content: "Free, frictionless PDF converter and utility tools." },
+      {
+        property: "og:title",
+        content: "PookiePDF Studio - 100% Free Online PDF Converter & PDF Editor",
+      },
+      {
+        property: "og:description",
+        content:
+          "PookiePDF Studio is a 100% free online PDF workspace. Compress PDF, Merge PDF, and Convert PDF to Word instantly with zero sign-ups, no registration, and no hidden paywalls.",
+      },
       { property: "og:type", content: "website" },
+      { property: "og:site_name", content: "PookiePDF Studio" },
+      { property: "og:url", content: "https://pookiepdfstudio.lovable.app" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
+      {
+        name: "twitter:title",
+        content: "PookiePDF Studio - 100% Free Online PDF Converter & PDF Editor",
+      },
+      {
+        name: "twitter:description",
+        content:
+          "100% free online PDF workspace. Compress PDF, Merge PDF, and Convert PDF to Word instantly — no sign-ups.",
+      },
     ],
     links: [
       {
@@ -92,6 +121,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: appCss,
       },
       { rel: "icon", href: "/favicon.png", type: "image/png" },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "PookiePDF Studio",
+          url: "https://pookiepdfstudio.lovable.app",
+          description:
+            "100% free online PDF workspace to compress, merge, and convert PDF to Word instantly with no sign-ups.",
+        }),
+      },
     ],
   }),
   shellComponent: RootShell,

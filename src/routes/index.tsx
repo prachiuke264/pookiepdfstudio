@@ -26,20 +26,55 @@ import {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "PookiePDF Studio - 100% Free PDF Tools" },
+      {
+        title: "PookiePDF Studio - 100% Free Online PDF Converter & PDF Editor",
+      },
       {
         name: "description",
         content:
-          "PookiePDF Studio is a free, frictionless PDF workspace. Convert, compress, merge, and transform files instantly — no sign-up, no paywalls.",
+          "PookiePDF Studio is a 100% free online PDF workspace. Compress PDF, Merge PDF, and Convert PDF to Word instantly with zero sign-ups, no registration, and no hidden paywalls.",
       },
-      { property: "og:title", content: "PookiePDF Studio - 100% Free PDF Tools" },
+      {
+        name: "keywords",
+        content:
+          "free PDF converter, PDF editor, compress PDF, merge PDF, PDF to Word, online PDF tools, free PDF tools, convert PDF, PDF compressor, image to PDF",
+      },
+      { name: "robots", content: "index, follow, max-image-preview:large" },
+      {
+        property: "og:title",
+        content: "PookiePDF Studio - 100% Free Online PDF Converter & PDF Editor",
+      },
       {
         property: "og:description",
         content:
-          "Convert, compress, merge, and transform PDFs instantly. 100% free, no sign-up required.",
+          "PookiePDF Studio is a 100% free online PDF workspace. Compress PDF, Merge PDF, and Convert PDF to Word instantly with zero sign-ups, no registration, and no hidden paywalls.",
       },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
+      { property: "og:url", content: "https://pookiepdfstudio.lovable.app" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+    links: [
+      { rel: "canonical", href: "https://pookiepdfstudio.lovable.app" },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebApplication",
+          name: "PookiePDF Studio",
+          applicationCategory: "UtilityApplication",
+          operatingSystem: "Web",
+          url: "https://pookiepdfstudio.lovable.app",
+          offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+          featureList: [
+            "Compress PDF",
+            "Merge PDF",
+            "Convert PDF to Word",
+            "Image to PDF",
+          ],
+        }),
+      },
     ],
   }),
   component: AeroPDFStudio,
@@ -207,9 +242,9 @@ function AeroPDFStudio() {
             100% Free Forever
           </div>
           <h1 className="mx-auto max-w-2xl text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl">
-            Convert PDFs instantly.
+            Free Online PDF Tools
             <br />
-            <span className="text-muted-foreground">Beautifully simple.</span>
+            <span className="text-muted-foreground">Convert PDFs instantly. Beautifully simple.</span>
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-base text-muted-foreground">
             No sign-up · No paywall · 100% Free Forever
@@ -445,6 +480,30 @@ function AeroPDFStudio() {
                 </p>
               </button>
             ))}
+          </div>
+        </section>
+        {/* SEO feature highlights */}
+        <section
+          aria-label="PDF tool highlights"
+          className="mt-20 grid gap-8 sm:grid-cols-3"
+        >
+          <div>
+            <h2 className="text-xl font-bold tracking-tight">Merge PDF Files Free</h2>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+              Combine multiple PDFs into one clean, ordered document in seconds — completely free, with no sign-up or registration.
+            </p>
+          </div>
+          <div>
+            <h2 className="text-xl font-bold tracking-tight">Compress PDF Size</h2>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+              Shrink PDF file size up to 90% without visible quality loss. Pick Low, Medium, or High compression and download instantly.
+            </p>
+          </div>
+          <div>
+            <h2 className="text-xl font-bold tracking-tight">Convert PDF to Word</h2>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+              Turn any PDF into an editable Word document instantly. Extract selectable text and keep your workflow moving.
+            </p>
           </div>
         </section>
       </main>
