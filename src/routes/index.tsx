@@ -269,7 +269,7 @@ function AeroPDFStudio() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-6 pb-20">
+      <main className="relative z-10 mx-auto max-w-6xl px-6 pb-20">
         {/* Hero */}
         <section className="pt-10 pb-12 text-center">
           <div className="mx-auto mb-5 inline-flex items-center gap-2 rounded-full bg-primary/60 px-4 py-1.5 text-xs font-semibold text-primary-foreground">
