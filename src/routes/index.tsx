@@ -149,7 +149,8 @@ function AeroPDFStudio() {
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [level, setLevel] = useState<CompressionLevel>("medium");
-  const [targetReduction, setTargetReduction] = useState(50);
+  const [targetSize, setTargetSize] = useState("500");
+  const [targetUnit, setTargetUnit] = useState<"KB" | "MB">("KB");
   const [result, setResult] = useState<{ before: number; after: number } | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const workspaceRef = useRef<HTMLElement>(null);
@@ -168,6 +169,16 @@ function AeroPDFStudio() {
       if (!incoming || incoming.length === 0) return;
       const list = Array.from(incoming);
       setFiles((prev) => (activeTool.multiple ? [...prev, ...list] : list.slice(0, 1)));
+      if (activeTool.id === "compress-pdf" && list[0]) {
+        const halfSize = list[0].size / 2;
+        if (halfSize >= 1024 * 1024) {
+          setTargetUnit("MB");
+          setTargetSize((halfSize / (1024 * 1024)).toFixed(2));
+        } else {
+          setTargetUnit("KB");
+          setTargetSize(Math.max(1, Math.round(halfSize / 1024)).toString());
+        }
+      }
       setDone(false);
       setError(null);
       setResult(null);
@@ -185,7 +196,14 @@ function AeroPDFStudio() {
     try {
       if (activeTool.id === "compress-pdf") {
         const before = files[0]!.size;
-        const bytes = await compressPdf(files[0]!, level, targetReduction);
+        const numericTarget = Number(targetSize);
+        const targetBytes = Math.round(
+          numericTarget * (targetUnit === "MB" ? 1024 * 1024 : 1024)
+        );
+        if (!Number.isFinite(targetBytes) || targetBytes <= 0) {
+          throw new Error("Invalid target size");
+        }
+        const bytes = await compressPdf(files[0]!, level, targetBytes);
         downloadBytes(bytes, `${base}-compressed.pdf`, "application/pdf");
         setResult({ before, after: bytes.byteLength });
       } else if (activeTool.id === "merge-pdf") {
@@ -211,7 +229,7 @@ function AeroPDFStudio() {
     } finally {
       setConverting(false);
     }
-  }, [files, converting, activeTool, level, targetReduction]);
+  }, [files, converting, activeTool, level, targetSize, targetUnit]);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -289,9 +307,11 @@ function AeroPDFStudio() {
                 : "border-primary/70 bg-primary/15 hover:bg-primary/25"
             }`}
           >
-            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-card shadow-sm">
-              <activeTool.icon className="h-7 w-7 text-foreground/70" />
-            </div>
+            <img
+              src={logoAsset.url}
+              alt="PookiePDF document with pink bow"
+              className="mb-5 h-20 w-20 object-contain drop-shadow-sm sm:h-24 sm:w-24"
+            />
             <p className="text-lg font-semibold">{activeTool.dropText}</p>
             <p className="mt-1 text-sm text-muted-foreground">
               or <span className="font-medium underline underline-offset-2">browse your device</span> — {activeTool.dropHint}
@@ -374,32 +394,44 @@ function AeroPDFStudio() {
               </div>
 
               <div className="mt-5">
-                <div className="flex items-center justify-between">
-                  <label
-                    htmlFor="target-reduction"
-                    className="text-sm font-bold text-[#2C2524]"
-                  >
-                    Target size reduction
-                  </label>
-                  <span className="rounded-full bg-primary px-3 py-1 text-xs font-bold text-primary-foreground">
-                    {targetReduction}%
-                  </span>
+                <label
+                  htmlFor="target-file-size"
+                  className="text-sm font-bold text-[#2C2524]"
+                >
+                  Target File Size
+                </label>
+                <div className="mt-2 flex min-w-0 items-stretch rounded-xl border border-border bg-card p-1 shadow-sm focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/30">
+                  <input
+                    id="target-file-size"
+                    type="number"
+                    inputMode="decimal"
+                    min="0.01"
+                    step={targetUnit === "MB" ? "0.01" : "1"}
+                    value={targetSize}
+                    onChange={(e) => setTargetSize(e.target.value)}
+                    aria-describedby="target-file-size-hint"
+                    className="min-w-0 flex-1 bg-transparent px-3 py-2.5 text-lg font-extrabold text-[#2C2524] outline-none"
+                  />
+                  <div className="grid shrink-0 grid-cols-2 rounded-lg bg-secondary p-1" aria-label="File size unit">
+                    {(["KB", "MB"] as const).map((unit) => (
+                      <button
+                        key={unit}
+                        type="button"
+                        onClick={() => setTargetUnit(unit)}
+                        aria-pressed={targetUnit === unit}
+                        className={`min-w-12 rounded-md px-3 py-2 text-xs font-bold transition-colors ${
+                          targetUnit === unit
+                            ? "bg-card text-[#2C2524] shadow-sm"
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        {unit}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-                <input
-                  id="target-reduction"
-                  type="range"
-                  min={10}
-                  max={90}
-                  step={5}
-                  value={targetReduction}
-                  disabled={level === "low"}
-                  onChange={(e) => setTargetReduction(Number(e.target.value))}
-                  className="mt-3 w-full accent-[#2C3539] disabled:opacity-40"
-                />
-                <p className="mt-2 text-xs text-muted-foreground">
-                  {level === "low"
-                    ? "Low keeps every page lossless, so the target slider is off."
-                    : "Higher targets mean stronger page downscaling. Actual savings depend on the file."}
+                <p id="target-file-size-hint" className="mt-2 text-xs text-muted-foreground">
+                  Enter the final size you need. Actual output may vary slightly by document.
                 </p>
               </div>
             </div>

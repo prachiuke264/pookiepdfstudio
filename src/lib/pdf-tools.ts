@@ -20,7 +20,7 @@ function stripMetadata(pdf: PDFDocument) {
 export async function compressPdf(
   file: File,
   level: CompressionLevel,
-  targetReduction = 50
+  targetBytes: number
 ): Promise<Uint8Array> {
   const bytes = new Uint8Array(await file.arrayBuffer());
   const src = await PDFDocument.load(bytes, { ignoreEncryption: true });
@@ -47,15 +47,42 @@ export async function compressPdf(
     objectsPerTick: 200,
   });
 
-  if (level === "low") return lossless;
+  if (lossless.byteLength <= targetBytes) return lossless;
 
-  // Deeper compression: re-render pages as downscaled JPEG images.
-  const aggression = Math.min(0.95, Math.max(0.1, targetReduction / 100));
-  const quality = Math.max(0.35, 0.9 - aggression * 0.55);
-  const scale = Math.max(0.6, 1.6 - aggression * 1.0);
+  // Re-render progressively until the closest practical target is found.
+  // PDFs cannot always hit an exact byte count because page objects add fixed
+  // overhead, so the closest valid result is returned without padding bytes.
+  const ratio = Math.min(1, Math.max(0.02, targetBytes / lossless.byteLength));
+  const settings = {
+    low: { scale: 1.7, quality: 0.9, scaleStep: 0.1, qualityStep: 0.05 },
+    medium: { scale: 1.45, quality: 0.82, scaleStep: 0.14, qualityStep: 0.08 },
+    high: { scale: 1.2, quality: 0.72, scaleStep: 0.17, qualityStep: 0.1 },
+  }[level];
+  const ratioScale = Math.max(0.45, Math.sqrt(ratio));
+  let best = lossless;
+  let bestDistance = Math.abs(lossless.byteLength - targetBytes);
+
   try {
-    const raster = await rasterizePdf(file, scale, quality);
-    return raster.byteLength < lossless.byteLength ? raster : lossless;
+    for (let attempt = 0; attempt < 5; attempt += 1) {
+      const scale = Math.max(
+        0.38,
+        settings.scale * ratioScale - settings.scaleStep * attempt
+      );
+      const quality = Math.max(
+        0.3,
+        settings.quality - settings.qualityStep * attempt
+      );
+      const raster = await rasterizePdf(file, scale, quality);
+      const distance = Math.abs(raster.byteLength - targetBytes);
+      if (raster.byteLength < best.byteLength && distance < bestDistance) {
+        best = raster;
+        bestDistance = distance;
+      }
+      if (raster.byteLength <= targetBytes && raster.byteLength >= targetBytes * 0.9) {
+        break;
+      }
+    }
+    return best;
   } catch {
     return lossless;
   }
