@@ -266,6 +266,7 @@ function AeroPDFStudio() {
           <Lock className="h-3.5 w-3.5" />
           No sign-up · No paywall
         </div>
+        </div>
       </header>
 
       <main className="mx-auto max-w-6xl px-6 pb-20">
