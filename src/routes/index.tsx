@@ -232,9 +232,25 @@ function AeroPDFStudio() {
   }, [files, converting, activeTool, level, targetSize, targetUnit]);
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="relative min-h-screen bg-background text-foreground">
+      {/* Ambient floating orbs */}
+      <div
+        aria-hidden
+        className="pointer-events-none fixed left-[-10rem] top-[-12rem] h-[40rem] w-[40rem] rounded-full bg-[#BCD4EE] opacity-25 blur-[120px]"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none fixed bottom-[-14rem] right-[-12rem] h-[42rem] w-[42rem] rounded-full bg-[#F3DEDE] opacity-25 blur-[120px]"
+      />
+      {/* Minimalist dot-matrix mesh */}
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-0 opacity-[0.03] [background-image:radial-gradient(#2C2524_1px,transparent_1px)] [background-size:22px_22px]"
+      />
+
       {/* Header */}
-      <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
+      <header className="sticky top-0 z-40 border-b border-[#BCD4EE]/40 bg-background/70 backdrop-blur-md">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
         <div className="flex items-center gap-3">
           <img
             src={logoAsset.url}
