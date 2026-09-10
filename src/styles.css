@@ -142,3 +142,27 @@
     color: var(--color-foreground);
   }
 }
+
+/* 3D claymorphism ambient accents — gentle drift physics */
+@keyframes clay-float-a {
+  0%, 100% { transform: translateY(0) translateX(0) rotate(0deg); }
+  50% { transform: translateY(-18px) translateX(6px) rotate(6deg); }
+}
+@keyframes clay-float-b {
+  0%, 100% { transform: translateY(0) translateX(0) rotate(0deg); }
+  50% { transform: translateY(-12px) translateX(-8px) rotate(-8deg); }
+}
+@keyframes clay-float-c {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-22px) rotate(10deg); }
+}
+
+@utility clay-float-a {
+  animation: clay-float-a 7s ease-in-out infinite;
+}
+@utility clay-float-b {
+  animation: clay-float-b 9s ease-in-out infinite;
+}
+@utility clay-float-c {
+  animation: clay-float-c 11s ease-in-out infinite;
+}
