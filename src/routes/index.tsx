@@ -248,6 +248,28 @@ function AeroPDFStudio() {
         className="pointer-events-none fixed inset-0 opacity-[0.03] [background-image:radial-gradient(#2C2524_1px,transparent_1px)] [background-size:22px_22px]"
       />
 
+      {/* 3D claymorphism ambient accent tokens */}
+      <div
+        aria-hidden
+        className="clay-float-a pointer-events-none fixed left-[7%] top-[20%] h-24 w-24 rounded-full bg-[radial-gradient(circle_at_32%_26%,#FFF6F6_0%,#F3DEDE_42%,#E0B9B9_100%)] opacity-90 [filter:drop-shadow(4px_6px_8px_rgba(0,0,0,0.06))]"
+      />
+      <div
+        aria-hidden
+        className="clay-float-b pointer-events-none fixed right-[11%] top-[33%] h-16 w-16 rounded-full bg-[radial-gradient(circle_at_32%_26%,#FFF6F6_0%,#F3DEDE_42%,#E0B9B9_100%)] opacity-90 [filter:drop-shadow(4px_6px_8px_rgba(0,0,0,0.06))]"
+      />
+      <div
+        aria-hidden
+        className="clay-float-c pointer-events-none fixed left-[16%] bottom-[15%] h-14 w-28 rounded-[3rem] bg-[linear-gradient(180deg,#FCF3E6_0%,#F0E2CB_55%,#DCC8A8_100%)] opacity-90 [filter:drop-shadow(4px_6px_8px_rgba(0,0,0,0.06))]"
+      />
+      <div
+        aria-hidden
+        className="clay-float-a pointer-events-none fixed right-[19%] bottom-[22%] h-12 w-12 rounded-full bg-[radial-gradient(circle_at_32%_26%,#FFF6F6_0%,#F3DEDE_42%,#E0B9B9_100%)] opacity-85 [filter:drop-shadow(4px_6px_8px_rgba(0,0,0,0.06))]"
+      />
+      <div
+        aria-hidden
+        className="clay-float-b pointer-events-none fixed left-[46%] top-[10%] h-10 w-20 rounded-[2.5rem] bg-[linear-gradient(180deg,#FCF3E6_0%,#F0E2CB_55%,#DCC8A8_100%)] opacity-85 [filter:drop-shadow(4px_6px_8px_rgba(0,0,0,0.06))]"
+      />
+
       {/* Header */}
       <header className="sticky top-0 z-40 border-b border-[#BCD4EE]/40 bg-background/70 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
@@ -255,7 +277,7 @@ function AeroPDFStudio() {
           <img
             src={logoAsset.url}
             alt="PookiePDF Studio logo"
-            className="h-12 w-12 object-contain"
+            className="h-12 w-12 object-contain [filter:drop-shadow(0px_8px_24px_rgba(247,177,193,0.9))]"
           />
           <div>
             <p className="text-lg font-bold tracking-tight">PookiePDF Studio</p>
