@@ -277,7 +277,7 @@ function AeroPDFStudio() {
           <img
             src={logoAsset.url}
             alt="PookiePDF Studio logo"
-            className="h-12 w-12 object-contain [filter:drop-shadow(0px_8px_24px_rgba(243,222,222,0.6))]"
+            className="h-12 w-12 object-contain [filter:drop-shadow(0px_8px_24px_rgba(243,222,222,0.95))]"
           />
           <div>
             <p className="text-lg font-bold tracking-tight">PookiePDF Studio</p>
