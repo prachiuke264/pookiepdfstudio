@@ -95,6 +95,10 @@
   --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
   --sidebar-border: oklch(0.929 0.013 255.508);
   --sidebar-ring: oklch(0.704 0.04 256.788);
+  --bubble-pink-light: rgba(255, 249, 251, 0.78);
+  --bubble-pink-mid: rgba(243, 222, 222, 0.48);
+  --bubble-pink-deep: rgba(233, 172, 190, 0.2);
+  --bubble-pink-border: rgba(243, 222, 222, 0.78);
 }
 
 .dark {
@@ -143,26 +147,3 @@
   }
 }
 
-/* 3D claymorphism ambient accents — gentle drift physics */
-@keyframes clay-float-a {
-  0%, 100% { transform: translateY(0) translateX(0) rotate(0deg); }
-  50% { transform: translateY(-18px) translateX(6px) rotate(6deg); }
-}
-@keyframes clay-float-b {
-  0%, 100% { transform: translateY(0) translateX(0) rotate(0deg); }
-  50% { transform: translateY(-12px) translateX(-8px) rotate(-8deg); }
-}
-@keyframes clay-float-c {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(-22px) rotate(10deg); }
-}
-
-@utility clay-float-a {
-  animation: clay-float-a 7s ease-in-out infinite;
-}
-@utility clay-float-b {
-  animation: clay-float-b 9s ease-in-out infinite;
-}
-@utility clay-float-c {
-  animation: clay-float-c 11s ease-in-out infinite;
-}

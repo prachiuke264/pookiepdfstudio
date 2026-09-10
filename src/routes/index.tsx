@@ -12,6 +12,7 @@ import {
   Lock,
 } from "lucide-react";
 import logoAsset from "../assets/aeropdf-logo.png.asset.json";
+import { PinkBubbleCanvas } from "@/components/PinkBubbleCanvas";
 import {
   compressPdf,
   downloadBytes,
@@ -232,43 +233,13 @@ function AeroPDFStudio() {
   }, [files, converting, activeTool, level, targetSize, targetUnit]);
 
   return (
-    <div className="relative min-h-screen bg-background text-foreground">
-      {/* Ambient floating orbs */}
-      <div
-        aria-hidden
-        className="pointer-events-none fixed left-[-10rem] top-[-12rem] h-[40rem] w-[40rem] rounded-full bg-[#BCD4EE] opacity-25 blur-[120px]"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none fixed bottom-[-14rem] right-[-12rem] h-[42rem] w-[42rem] rounded-full bg-[#F3DEDE] opacity-25 blur-[120px]"
-      />
+    <div className="relative isolate min-h-screen bg-background text-foreground">
       {/* Minimalist dot-matrix mesh */}
       <div
         aria-hidden
-        className="pointer-events-none fixed inset-0 opacity-[0.03] [background-image:radial-gradient(#2C2524_1px,transparent_1px)] [background-size:22px_22px]"
+        className="pointer-events-none fixed inset-0 z-0 opacity-[0.03] [background-image:radial-gradient(#2C2524_1px,transparent_1px)] [background-size:22px_22px]"
       />
-
-      {/* 3D claymorphism ambient accent tokens */}
-      <div
-        aria-hidden
-        className="clay-float-a pointer-events-none fixed left-[7%] top-[20%] h-24 w-24 rounded-full bg-[radial-gradient(circle_at_32%_26%,#FFF6F6_0%,#F3DEDE_42%,#E0B9B9_100%)] opacity-90 [filter:drop-shadow(4px_6px_8px_rgba(0,0,0,0.06))]"
-      />
-      <div
-        aria-hidden
-        className="clay-float-b pointer-events-none fixed right-[11%] top-[33%] h-16 w-16 rounded-full bg-[radial-gradient(circle_at_32%_26%,#FFF6F6_0%,#F3DEDE_42%,#E0B9B9_100%)] opacity-90 [filter:drop-shadow(4px_6px_8px_rgba(0,0,0,0.06))]"
-      />
-      <div
-        aria-hidden
-        className="clay-float-c pointer-events-none fixed left-[16%] bottom-[15%] h-14 w-28 rounded-[3rem] bg-[linear-gradient(180deg,#FCF3E6_0%,#F0E2CB_55%,#DCC8A8_100%)] opacity-90 [filter:drop-shadow(4px_6px_8px_rgba(0,0,0,0.06))]"
-      />
-      <div
-        aria-hidden
-        className="clay-float-a pointer-events-none fixed right-[19%] bottom-[22%] h-12 w-12 rounded-full bg-[radial-gradient(circle_at_32%_26%,#FFF6F6_0%,#F3DEDE_42%,#E0B9B9_100%)] opacity-85 [filter:drop-shadow(4px_6px_8px_rgba(0,0,0,0.06))]"
-      />
-      <div
-        aria-hidden
-        className="clay-float-b pointer-events-none fixed left-[46%] top-[10%] h-10 w-20 rounded-[2.5rem] bg-[linear-gradient(180deg,#FCF3E6_0%,#F0E2CB_55%,#DCC8A8_100%)] opacity-85 [filter:drop-shadow(4px_6px_8px_rgba(0,0,0,0.06))]"
-      />
+      <PinkBubbleCanvas />
 
       {/* Header */}
       <header className="sticky top-0 z-40 border-b border-[#BCD4EE]/40 bg-background/70 backdrop-blur-md">
@@ -590,7 +561,7 @@ function AeroPDFStudio() {
       )}
 
       {/* Footer */}
-      <footer className="border-t border-border py-8 text-center text-xs text-muted-foreground">
+      <footer className="relative z-10 border-t border-border py-8 text-center text-xs text-muted-foreground">
         PookiePDF Studio — free PDF tools, no strings attached.
       </footer>
     </div>
