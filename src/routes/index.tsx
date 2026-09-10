@@ -251,23 +251,23 @@ function AeroPDFStudio() {
       {/* 3D claymorphism ambient accent tokens */}
       <div
         aria-hidden
-        className="clay-float-a pointer-events-none fixed left-[8%] top-[22%] h-14 w-14 rounded-full bg-[#F3DEDE] opacity-70 blur-[1px] [filter:drop-shadow(4px_6px_8px_rgba(0,0,0,0.06))]"
+        className="clay-float-a pointer-events-none fixed left-[8%] top-[22%] h-14 w-14 rounded-full bg-[radial-gradient(circle_at_30%_25%,#FFEFF0,#F3DEDE_60%,#E9C9C9)] opacity-80 [filter:drop-shadow(4px_6px_8px_rgba(0,0,0,0.06))]"
       />
       <div
         aria-hidden
-        className="clay-float-b pointer-events-none fixed right-[12%] top-[34%] h-10 w-10 rounded-full bg-[#F3DEDE] opacity-65 blur-[1px] [filter:drop-shadow(4px_6px_8px_rgba(0,0,0,0.06))]"
+        className="clay-float-b pointer-events-none fixed right-[12%] top-[34%] h-10 w-10 rounded-full bg-[radial-gradient(circle_at_30%_25%,#FFEFF0,#F3DEDE_60%,#E9C9C9)] opacity-75 [filter:drop-shadow(4px_6px_8px_rgba(0,0,0,0.06))]"
       />
       <div
         aria-hidden
-        className="clay-float-c pointer-events-none fixed left-[18%] bottom-[16%] h-9 w-16 rounded-[2rem] bg-[#FAF0E6] opacity-70 blur-[1px] [filter:drop-shadow(4px_6px_8px_rgba(0,0,0,0.06))]"
+        className="clay-float-c pointer-events-none fixed left-[18%] bottom-[16%] h-9 w-16 rounded-[2rem] bg-[linear-gradient(180deg,#FCF3E6,#F0E2CB_55%,#E2D2B5)] opacity-80 [filter:drop-shadow(4px_6px_8px_rgba(0,0,0,0.06))]"
       />
       <div
         aria-hidden
-        className="clay-float-a pointer-events-none fixed right-[20%] bottom-[24%] h-7 w-7 rounded-full bg-[#F3DEDE] opacity-60 blur-[1px] [filter:drop-shadow(4px_6px_8px_rgba(0,0,0,0.06))]"
+        className="clay-float-a pointer-events-none fixed right-[20%] bottom-[24%] h-7 w-7 rounded-full bg-[radial-gradient(circle_at_30%_25%,#FFEFF0,#F3DEDE_60%,#E9C9C9)] opacity-70 [filter:drop-shadow(4px_6px_8px_rgba(0,0,0,0.06))]"
       />
       <div
         aria-hidden
-        className="clay-float-b pointer-events-none fixed left-[44%] top-[12%] h-6 w-12 rounded-[1.5rem] bg-[#FAF0E6] opacity-65 blur-[1px] [filter:drop-shadow(4px_6px_8px_rgba(0,0,0,0.06))]"
+        className="clay-float-b pointer-events-none fixed left-[44%] top-[12%] h-6 w-12 rounded-[1.5rem] bg-[linear-gradient(180deg,#FCF3E6,#F0E2CB_55%,#E2D2B5)] opacity-75 [filter:drop-shadow(4px_6px_8px_rgba(0,0,0,0.06))]"
       />
 
       {/* Header */}
