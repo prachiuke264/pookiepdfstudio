@@ -1,0 +1,157 @@
+import { useEffect, useRef } from "react";
+
+type Bubble = {
+  x: number;
+  y: number;
+  radius: number;
+  vx: number;
+  vy: number;
+  tint: number;
+};
+
+const BUBBLE_COUNT_DESKTOP = 16;
+const BUBBLE_COUNT_MOBILE = 9;
+
+export function PinkBubbleCanvas() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const context = canvas.getContext("2d");
+    if (!context) return;
+
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let width = 0;
+    let height = 0;
+    let animationFrame = 0;
+    let bubbles: Bubble[] = [];
+
+    const bubbleColors = getComputedStyle(document.documentElement);
+    const pinkLight = bubbleColors.getPropertyValue("--bubble-pink-light").trim();
+    const pinkMid = bubbleColors.getPropertyValue("--bubble-pink-mid").trim();
+    const pinkDeep = bubbleColors.getPropertyValue("--bubble-pink-deep").trim();
+    const pinkBorder = bubbleColors.getPropertyValue("--bubble-pink-border").trim();
+
+    const createBubble = (): Bubble => {
+      const radius = 20 + Math.random() * 48;
+      const speed = 1.7 + Math.random() * 2.2;
+      const angle = Math.random() * Math.PI * 2;
+      return {
+        x: radius + Math.random() * Math.max(1, width - radius * 2),
+        y: radius + Math.random() * Math.max(1, height - radius * 2),
+        radius,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        tint: Math.random(),
+      };
+    };
+
+    const resize = () => {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      const ratio = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.floor(width * ratio);
+      canvas.height = Math.floor(height * ratio);
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      context.setTransform(ratio, 0, 0, ratio, 0, 0);
+      const targetCount = width < 640 ? BUBBLE_COUNT_MOBILE : BUBBLE_COUNT_DESKTOP;
+      bubbles = Array.from({ length: targetCount }, createBubble);
+    };
+
+    const drawBubble = (bubble: Bubble) => {
+      context.save();
+      context.beginPath();
+      context.arc(bubble.x, bubble.y, bubble.radius, 0, Math.PI * 2);
+
+      const fill = context.createRadialGradient(
+        bubble.x - bubble.radius * 0.34,
+        bubble.y - bubble.radius * 0.38,
+        bubble.radius * 0.05,
+        bubble.x,
+        bubble.y,
+        bubble.radius
+      );
+      fill.addColorStop(0, pinkLight);
+      fill.addColorStop(0.28, bubble.tint > 0.5 ? pinkMid : pinkLight);
+      fill.addColorStop(0.72, pinkMid);
+      fill.addColorStop(1, pinkDeep);
+      context.fillStyle = fill;
+      context.fill();
+
+      context.strokeStyle = pinkBorder;
+      context.lineWidth = 1.25;
+      context.stroke();
+
+      const reflection = context.createLinearGradient(
+        bubble.x - bubble.radius * 0.5,
+        bubble.y - bubble.radius * 0.6,
+        bubble.x + bubble.radius * 0.15,
+        bubble.y + bubble.radius * 0.15
+      );
+      reflection.addColorStop(0, "rgba(255, 255, 255, 0.9)");
+      reflection.addColorStop(0.45, "rgba(255, 255, 255, 0.18)");
+      reflection.addColorStop(1, "rgba(255, 255, 255, 0)");
+      context.beginPath();
+      context.ellipse(
+        bubble.x - bubble.radius * 0.27,
+        bubble.y - bubble.radius * 0.32,
+        bubble.radius * 0.17,
+        bubble.radius * 0.34,
+        Math.PI / 4,
+        0,
+        Math.PI * 2
+      );
+      context.fillStyle = reflection;
+      context.fill();
+      context.restore();
+    };
+
+    const render = () => {
+      context.clearRect(0, 0, width, height);
+      for (const bubble of bubbles) {
+        if (!reduceMotion.matches) {
+          bubble.x += bubble.vx;
+          bubble.y += bubble.vy;
+
+          if (bubble.x - bubble.radius <= 0 || bubble.x + bubble.radius >= width) {
+            bubble.vx *= -1;
+            bubble.x = Math.max(bubble.radius, Math.min(width - bubble.radius, bubble.x));
+          }
+          if (bubble.y - bubble.radius <= 0 || bubble.y + bubble.radius >= height) {
+            bubble.vy *= -1;
+            bubble.y = Math.max(bubble.radius, Math.min(height - bubble.radius, bubble.y));
+          }
+        }
+        drawBubble(bubble);
+      }
+      animationFrame = window.requestAnimationFrame(render);
+    };
+
+    const handleVisibility = () => {
+      window.cancelAnimationFrame(animationFrame);
+      if (!document.hidden) animationFrame = window.requestAnimationFrame(render);
+    };
+
+    resize();
+    render();
+    window.addEventListener("resize", resize);
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    return () => {
+      window.cancelAnimationFrame(animationFrame);
+      window.removeEventListener("resize", resize);
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      aria-hidden="true"
+      className="pointer-events-none fixed inset-0 z-0 h-screen w-screen"
+    />
+  );
+}
