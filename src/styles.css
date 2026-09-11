@@ -95,10 +95,11 @@
   --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
   --sidebar-border: oklch(0.929 0.013 255.508);
   --sidebar-ring: oklch(0.704 0.04 256.788);
-  --bubble-pink-light: rgba(255, 249, 251, 0.78);
-  --bubble-pink-mid: rgba(243, 222, 222, 0.48);
-  --bubble-pink-deep: rgba(233, 172, 190, 0.2);
-  --bubble-pink-border: rgba(243, 222, 222, 0.78);
+  --bubble-pink-light: rgba(244, 215, 215, 0.4);
+  --bubble-pink-mid: rgba(248, 226, 226, 0.32);
+  --bubble-pink-deep: rgba(244, 215, 215, 0.08);
+  --bubble-pink-border: rgba(255, 255, 255, 0.5);
+  --bubble-pink-specular: rgba(255, 255, 255, 0.75);
 }
 
 .dark {
