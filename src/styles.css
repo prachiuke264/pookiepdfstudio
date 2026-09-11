@@ -138,6 +138,27 @@
   --sidebar-ring: oklch(0.551 0.027 264.364);
 }
 
+@keyframes doll-idle {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-3px) rotate(-1deg); }
+}
+
+@keyframes doll-play {
+  0% { transform: translateY(0) rotate(0deg) scale(1); }
+  25% { transform: translateY(-10px) rotate(-8deg) scale(1.05); }
+  50% { transform: translateY(-2px) rotate(6deg) scale(0.99); }
+  75% { transform: translateY(-6px) rotate(-3deg) scale(1.02); }
+  100% { transform: translateY(0) rotate(0deg) scale(1); }
+}
+
+@utility animate-doll-idle {
+  animation: doll-idle 4s ease-in-out infinite;
+}
+
+@utility animate-doll-play {
+  animation: doll-play 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
 @layer base {
   * {
     border-color: var(--color-border);

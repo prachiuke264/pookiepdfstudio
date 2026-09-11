@@ -177,6 +177,9 @@ export function PinkBubbleCanvas() {
         }
         drawBubble(bubble);
       }
+      // Expose bubble positions so decorative elements can react to them.
+      (window as unknown as { __pookieBubbles?: unknown }).__pookieBubbles =
+        bubbles.map((b) => ({ x: b.x, y: b.y, radius: b.radius }));
       animationFrame = window.requestAnimationFrame(render);
     };
 
