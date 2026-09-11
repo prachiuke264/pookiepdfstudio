@@ -33,6 +33,7 @@ export function PinkBubbleCanvas() {
     const pinkMid = bubbleColors.getPropertyValue("--bubble-pink-mid").trim();
     const pinkDeep = bubbleColors.getPropertyValue("--bubble-pink-deep").trim();
     const pinkBorder = bubbleColors.getPropertyValue("--bubble-pink-border").trim();
+    const pinkSpecular = bubbleColors.getPropertyValue("--bubble-pink-specular").trim();
 
     const createBubble = (): Bubble => {
       const radius = 20 + Math.random() * 48;
@@ -66,6 +67,7 @@ export function PinkBubbleCanvas() {
       context.beginPath();
       context.arc(bubble.x, bubble.y, bubble.radius, 0, Math.PI * 2);
 
+      // Soft pastel rose-pink translucent radial mesh — light blush outer fringe
       const fill = context.createRadialGradient(
         bubble.x - bubble.radius * 0.34,
         bubble.y - bubble.radius * 0.38,
@@ -75,31 +77,66 @@ export function PinkBubbleCanvas() {
         bubble.radius
       );
       fill.addColorStop(0, pinkLight);
-      fill.addColorStop(0.28, bubble.tint > 0.5 ? pinkMid : pinkLight);
-      fill.addColorStop(0.72, pinkMid);
+      fill.addColorStop(0.35, bubble.tint > 0.5 ? pinkMid : pinkLight);
+      fill.addColorStop(0.78, pinkMid);
       fill.addColorStop(1, pinkDeep);
       context.fillStyle = fill;
       context.fill();
 
+      // Dual-layered translucent white liquid border with internal drop shadow sheen
+      // Outer translucent white border
       context.strokeStyle = pinkBorder;
-      context.lineWidth = 1.25;
+      context.lineWidth = 1.4;
+      context.shadowColor = "rgba(255, 255, 255, 0.35)";
+      context.shadowBlur = 6;
+      context.shadowOffsetX = 0;
+      context.shadowOffsetY = 0;
       context.stroke();
 
+      // Ultra-faint inner border for tactile water-droplet rim
+      context.shadowBlur = 0;
+      context.beginPath();
+      context.arc(bubble.x, bubble.y, bubble.radius - 1.6, 0, Math.PI * 2);
+      context.strokeStyle = "rgba(255, 255, 255, 0.18)";
+      context.lineWidth = 0.8;
+      context.stroke();
+
+      // Crisp bright specular highlight near top-left inner edge (crystal-glass reflection)
+      const specularX = bubble.x - bubble.radius * 0.38;
+      const specularY = bubble.y - bubble.radius * 0.42;
+      const specularR = Math.max(1, bubble.radius * 0.16);
+      const specular = context.createRadialGradient(
+        specularX,
+        specularY,
+        0,
+        specularX,
+        specularY,
+        specularR
+      );
+      specular.addColorStop(0, pinkSpecular);
+      specular.addColorStop(0.6, "rgba(255, 255, 255, 0.25)");
+      specular.addColorStop(1, "rgba(255, 255, 255, 0)");
+      context.beginPath();
+      context.arc(specularX, specularY, specularR, 0, Math.PI * 2);
+      context.fillStyle = specular;
+      context.fill();
+
+      // Soft elongated secondary gloss streak for added 3D glass depth
       const reflection = context.createLinearGradient(
         bubble.x - bubble.radius * 0.5,
         bubble.y - bubble.radius * 0.6,
         bubble.x + bubble.radius * 0.15,
         bubble.y + bubble.radius * 0.15
       );
-      reflection.addColorStop(0, "rgba(255, 255, 255, 0.9)");
-      reflection.addColorStop(0.45, "rgba(255, 255, 255, 0.18)");
+      reflection.addColorStop(0, "rgba(255, 255, 255, 0.5)");
+      reflection.addColorStop(0.45, "rgba(255, 255, 255, 0.1)");
       reflection.addColorStop(1, "rgba(255, 255, 255, 0)");
       context.beginPath();
       context.ellipse(
-        bubble.x - bubble.radius * 0.27,
-        bubble.y - bubble.radius * 0.32,
-        bubble.radius * 0.17,
-        bubble.radius * 0.34,
+        bubble.x - bubble.radius * 0.22,
+        bubble.y - bubble.radius * 0.28,
+        bubble.radius * 0.12,
+        bubble.radius * 0.26,
         Math.PI / 4,
         0,
         Math.PI * 2
