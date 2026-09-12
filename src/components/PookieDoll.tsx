@@ -53,6 +53,7 @@ export function PookieDoll() {
       const list = bubbles();
       if (!list.length) return null;
       const b = list[Math.floor(Math.random() * list.length)];
+      if (!b) return null;
       return { x: b.x - width() / 2, y: b.y - width() / 2 };
     };
 
