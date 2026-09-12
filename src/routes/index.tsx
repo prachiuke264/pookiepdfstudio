@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import logoAsset from "../assets/aeropdf-logo.png.asset.json";
 import { PinkBubbleCanvas } from "@/components/PinkBubbleCanvas";
+import { PookieDoll } from "@/components/PookieDoll";
 import {
   compressPdf,
   downloadBytes,
@@ -311,12 +312,13 @@ function AeroPDFStudio() {
               setDragging(false);
               acceptFiles(e.dataTransfer.files);
             }}
-            className={`flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed px-6 py-14 text-center backdrop-blur-md transition-all duration-200 ${
+            className={`relative flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed px-6 py-14 text-center backdrop-blur-md transition-all duration-200 ${
               dragging
                 ? "border-primary bg-primary/40 scale-[1.01]"
                 : "border-primary/70 bg-primary/15 hover:bg-primary/25"
             }`}
           >
+            <PookieDoll />
             <img
               src={logoAsset.url}
               alt="PookiePDF document with pink bow"
