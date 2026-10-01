@@ -1,11 +1,13 @@
-import { useCallback, useEffect, useRef } from "react";
+import { motion } from "framer-motion";
+import { useCallback, useEffect, useRef, useState } from "react";
 import dollAsset from "@/assets/pookie-doll.png.asset.json";
 
 type Bubble = { x: number; y: number; radius: number };
 type Mode = "perch" | "ground" | "chase" | "return";
 
-const DOLL_W_DESKTOP = 100;
-const DOLL_W_MOBILE = 76;
+const DOLL_W_DESKTOP = 150;
+const DOLL_W_MOBILE = 114;
+const FALLBACK_ASPECT_RATIO = 570 / 335;
 
 const VOICE_LINES = {
   perch: ["Comfy up here!", "Hehe, I'm sitting on the box!", "Wheee, up I go!"],
@@ -14,22 +16,7 @@ const VOICE_LINES = {
   candy: ["Yummy candy! Thank you!", "Mmm, so sweet!", "Candy! Yay!"],
 };
 
-const pick = (arr: string[]) => arr[Math.floor(Math.random() * arr.length)] ?? arr[0]!;
-
-/** Speak with a cute high-pitched voice; cancels any queued line so lines never stutter or overlap. */
-function speak(text: string) {
-  if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
-  const synth = window.speechSynthesis;
-  synth.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.pitch = 2;
-  u.rate = 1.1;
-  u.volume = 0.9;
-  const voices = synth.getVoices();
-  const female = voices.find((v) => /female|samantha|zira|google uk english female|victoria/i.test(v.name));
-  if (female) u.voice = female;
-  synth.speak(u);
-}
+const pick = (arr: string[]) => arr[Math.floor(Math.random() * arr.length)] ?? "";
 
 /**
  * Interactive doll: perches on the dropzone top-right edge, hops down to the
@@ -42,6 +29,50 @@ export function PookieDoll() {
   const dollRef = useRef<HTMLImageElement>(null);
   const sparkRef = useRef<HTMLDivElement>(null);
   const candyRef = useRef<() => void>(() => {});
+  const speechIdRef = useRef(0);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isBlinking, setIsBlinking] = useState(false);
+
+  const speak = useCallback((text: string) => {
+    if (typeof window === "undefined" || !("speechSynthesis" in window) || !text) return;
+    const synth = window.speechSynthesis;
+    const speechId = speechIdRef.current + 1;
+    speechIdRef.current = speechId;
+    synth.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.pitch = 2;
+    utterance.rate = 1.1;
+    utterance.volume = 0.9;
+    const voices = synth.getVoices();
+    const female = voices.find((voice) =>
+      /female|samantha|zira|google uk english female|victoria/i.test(voice.name)
+    );
+    if (female) utterance.voice = female;
+
+    utterance.onstart = () => {
+      if (speechIdRef.current === speechId) setIsSpeaking(true);
+    };
+    const finish = () => {
+      if (speechIdRef.current === speechId) setIsSpeaking(false);
+    };
+    utterance.onend = finish;
+    utterance.onerror = finish;
+    synth.speak(utterance);
+  }, []);
+
+  useEffect(() => {
+    let blinkTimeout = 0;
+    const blink = () => {
+      setIsBlinking(true);
+      blinkTimeout = window.setTimeout(() => setIsBlinking(false), 150);
+    };
+    const blinkInterval = window.setInterval(blink, 3000);
+    return () => {
+      window.clearInterval(blinkInterval);
+      window.clearTimeout(blinkTimeout);
+    };
+  }, []);
 
   useEffect(() => {
     const anchor = anchorRef.current;
@@ -67,14 +98,21 @@ export function PookieDoll() {
     let frame = 0;
     let started = false;
 
+    const dollHeight = () => {
+      const naturalRatio = doll.naturalWidth > 0 ? doll.naturalHeight / doll.naturalWidth : FALLBACK_ASPECT_RATIO;
+      return width() * naturalRatio;
+    };
     const perchPos = () => {
       const r = anchor.getBoundingClientRect();
       const w = width();
-      return { x: r.left - w / 2, y: r.top - w * 1.05 };
+      return { x: r.left - w / 2, y: r.top - dollHeight() + 7 };
     };
     const groundPos = () => {
       const w = width();
-      return { x: Math.min(window.innerWidth - w - 24, perchPos().x), y: window.innerHeight - w * 1.15 };
+      return {
+        x: Math.max(20, Math.min(window.innerWidth - w - 20, perchPos().x)),
+        y: window.innerHeight - dollHeight() - 34,
+      };
     };
     const bubbles = (): Bubble[] =>
       (window as unknown as { __pookieBubbles?: Bubble[] }).__pookieBubbles ?? [];
@@ -186,7 +224,7 @@ export function PookieDoll() {
       window.cancelAnimationFrame(frame);
       window.speechSynthesis?.cancel();
     };
-  }, []);
+  }, [speak]);
 
   const giveCandy = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
@@ -195,10 +233,14 @@ export function PookieDoll() {
 
   return (
     <>
-      <span ref={anchorRef} aria-hidden="true" className="pointer-events-none absolute right-4 top-0 h-0 w-0 sm:right-8" />
+      <span
+        ref={anchorRef}
+        aria-hidden="true"
+        className="pointer-events-none absolute left-1/2 top-0 h-0 w-0 -translate-x-1/2"
+      />
       <div
         ref={layerRef}
-        className="pointer-events-none fixed left-0 top-0 z-10 w-[76px] will-change-transform sm:w-[100px]"
+        className="pointer-events-none fixed left-0 top-0 z-50 w-[114px] will-change-transform sm:w-[150px]"
       >
         <div className="relative">
           <div
@@ -210,12 +252,38 @@ export function PookieDoll() {
                 "radial-gradient(circle at 50% 50%, rgba(255,255,255,0.95) 0%, rgba(247,177,193,0.55) 35%, rgba(247,177,193,0) 70%)",
             }}
           />
-          <img
+          <motion.img
             ref={dollRef}
             src={dollAsset.url}
             alt=""
             aria-hidden="true"
             className="relative w-full origin-bottom select-none drop-shadow-[0_10px_18px_rgba(43,37,36,0.18)]"
+            animate={isSpeaking ? { y: [0, -1.5, 0], scale: [1, 1.008, 1] } : { y: 0, scale: 1 }}
+            transition={
+              isSpeaking
+                ? { duration: 0.32, repeat: Infinity, ease: "easeInOut" }
+                : { type: "spring", stiffness: 260, damping: 20 }
+            }
+          />
+          <motion.span
+            aria-hidden="true"
+            className="absolute left-[42.1%] top-[38.2%] h-[1.8%] w-[15.8%] origin-center rounded-full bg-foreground/70"
+            animate={{ scaleY: isBlinking ? 1 : 0, opacity: isBlinking ? 0.72 : 0 }}
+            transition={{ duration: 0.07, ease: "easeInOut" }}
+          />
+          <motion.span
+            aria-hidden="true"
+            className="absolute left-[48.2%] top-[43.4%] h-[1.7%] w-[4.8%] origin-center rounded-full bg-[#D9869A]/80"
+            animate={
+              isSpeaking
+                ? { scaleY: [0.55, 1.6, 0.75, 1.35, 0.55], y: [0, 0.5, 0, 0.5, 0] }
+                : { scaleY: 0.45, y: 0 }
+            }
+            transition={
+              isSpeaking
+                ? { duration: 0.38, repeat: Infinity, ease: "easeInOut" }
+                : { duration: 0.12 }
+            }
           />
           <button
             type="button"

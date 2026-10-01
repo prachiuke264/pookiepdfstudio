@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Use Framer Motion for PookieDoll's visible motion states and face overlays because those animations need synchronized spring transitions.
