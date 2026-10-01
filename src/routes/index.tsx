@@ -284,8 +284,9 @@ function AeroPDFStudio() {
         <section
           ref={workspaceRef}
           aria-label="PDF converter"
-          className="relative mx-auto max-w-3xl scroll-mt-24 rounded-3xl border border-border bg-card p-6 shadow-[0_20px_60px_-20px_oklch(0.24_0.03_245/0.15)] sm:p-10"
+          className="relative mx-auto mt-32 max-w-3xl scroll-mt-48 rounded-3xl border border-border bg-card p-6 shadow-[0_20px_60px_-20px_oklch(0.24_0.03_245/0.15)] sm:mt-44 sm:p-10"
         >
+          <PookieDoll />
           <div key={activeTool.id} className="mb-6 text-center">
             <h2 className="text-2xl font-extrabold tracking-tight sm:text-3xl">
               {activeTool.workspaceTitle}
@@ -318,7 +319,6 @@ function AeroPDFStudio() {
                 : "border-primary/70 bg-primary/15 hover:bg-primary/25"
             }`}
           >
-            <PookieDoll />
             <img
               src={logoAsset.url}
               alt="PookiePDF document with pink bow"
