@@ -7,7 +7,7 @@ type Mode = "perch" | "ground" | "chase" | "return";
 const DOLL_W_DESKTOP = 100;
 const DOLL_W_MOBILE = 76;
 
-const VOICE_LINES: Record<string, string[]> = {
+const VOICE_LINES = {
   perch: ["Comfy up here!", "Hehe, I'm sitting on the box!", "Wheee, up I go!"],
   ground: ["Boing! Down I go!", "La la la!", "Wiggle wiggle!"],
   wave: ["Hi bubble!", "Ooh, pretty bubble!", "Bubble, come play!"],
@@ -93,7 +93,7 @@ export function PookieDoll() {
     candyRef.current = () => {
       burst();
       waveUntil = performance.now() + 900;
-      speak(pick(VOICE_LINES.candy!));
+      speak(pick(VOICE_LINES.candy));
     };
 
     const tick = (now: number) => {
@@ -157,7 +157,7 @@ export function PookieDoll() {
           if (Math.hypot(b.x - cx, b.y - cy) < b.radius + w * 0.9) {
             waveUntil = now + 900;
             waveCooldown = now + 6000;
-            if (Math.random() < 0.4) speak(pick(VOICE_LINES.wave!));
+            if (Math.random() < 0.4) speak(pick(VOICE_LINES.wave));
             break;
           }
         }
