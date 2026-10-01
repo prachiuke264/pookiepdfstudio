@@ -28,7 +28,7 @@ export function PookieDoll() {
 
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
-    let width = () => (window.innerWidth < 640 ? DOLL_W_MOBILE : DOLL_W_DESKTOP);
+    const width = () => (window.innerWidth < 640 ? DOLL_W_MOBILE : DOLL_W_DESKTOP);
     let x = 0;
     let y = 0;
     let mode: Mode = "home";
