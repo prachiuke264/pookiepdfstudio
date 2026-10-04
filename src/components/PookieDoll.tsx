@@ -26,7 +26,7 @@ const pick = (arr: string[]) => arr[Math.floor(Math.random() * arr.length)] ?? "
 export function PookieDoll() {
   const anchorRef = useRef<HTMLSpanElement>(null);
   const layerRef = useRef<HTMLDivElement>(null);
-  const dollRef = useRef<HTMLImageElement>(null);
+  const dollRef = useRef<HTMLDivElement>(null);
   const sparkRef = useRef<HTMLDivElement>(null);
   const candyRef = useRef<() => void>(() => {});
   const speechIdRef = useRef(0);
@@ -98,10 +98,7 @@ export function PookieDoll() {
     let frame = 0;
     let started = false;
 
-    const dollHeight = () => {
-      const naturalRatio = doll.naturalWidth > 0 ? doll.naturalHeight / doll.naturalWidth : FALLBACK_ASPECT_RATIO;
-      return width() * naturalRatio;
-    };
+    const dollHeight = () => width() * FALLBACK_ASPECT_RATIO;
     const perchPos = () => {
       const r = anchor.getBoundingClientRect();
       const w = width();
@@ -252,39 +249,47 @@ export function PookieDoll() {
                 "radial-gradient(circle at 50% 50%, rgba(255,255,255,0.95) 0%, rgba(247,177,193,0.55) 35%, rgba(247,177,193,0) 70%)",
             }}
           />
-          <motion.img
-            ref={dollRef}
-            src={dollAsset.url}
-            alt=""
-            aria-hidden="true"
-            className="relative w-full origin-bottom select-none drop-shadow-[0_10px_18px_rgba(43,37,36,0.18)]"
+          <motion.div
+            className="relative origin-bottom"
             animate={isSpeaking ? { y: [0, -1.5, 0], scale: [1, 1.008, 1] } : { y: 0, scale: 1 }}
             transition={
               isSpeaking
                 ? { duration: 0.32, repeat: Infinity, ease: "easeInOut" }
                 : { type: "spring", stiffness: 260, damping: 20 }
             }
-          />
-          <motion.span
-            aria-hidden="true"
-            className="absolute left-[42.1%] top-[38.2%] h-[1.8%] w-[15.8%] origin-center rounded-full bg-foreground/70"
-            animate={{ scaleY: isBlinking ? 1 : 0, opacity: isBlinking ? 0.72 : 0 }}
-            transition={{ duration: 0.07, ease: "easeInOut" }}
-          />
-          <motion.span
-            aria-hidden="true"
-            className="absolute left-[48.2%] top-[43.4%] h-[1.7%] w-[4.8%] origin-center rounded-full bg-[#D9869A]/80"
-            animate={
-              isSpeaking
-                ? { scaleY: [0.55, 1.6, 0.75, 1.35, 0.55], y: [0, 0.5, 0, 0.5, 0] }
-                : { scaleY: 0.45, y: 0 }
-            }
-            transition={
-              isSpeaking
-                ? { duration: 0.38, repeat: Infinity, ease: "easeInOut" }
-                : { duration: 0.12 }
-            }
-          />
+          >
+            <div ref={dollRef} className="relative origin-bottom">
+              <img
+                src={dollAsset.url}
+                alt=""
+                aria-hidden="true"
+                className="relative w-full select-none drop-shadow-[0_10px_18px_rgba(43,37,36,0.18)]"
+              />
+              {["left-[38.5%]", "left-[54%]"].map((position) => (
+                <motion.span
+                  key={position}
+                  aria-hidden="true"
+                  className={`absolute ${position} top-[31.5%] h-[1.15%] w-[7.2%] origin-center rounded-full bg-foreground/75`}
+                  animate={{ scaleY: isBlinking ? 1 : 0, opacity: isBlinking ? 0.78 : 0 }}
+                  transition={{ duration: 0.07, ease: "easeInOut" }}
+                />
+              ))}
+              <motion.span
+                aria-hidden="true"
+                className="absolute left-[47.1%] top-[39.2%] h-[1.6%] w-[5.2%] origin-center rounded-full bg-[#D9869A]/80"
+                animate={
+                  isSpeaking
+                    ? { scaleY: [0.55, 1.6, 0.75, 1.35, 0.55], y: [0, 0.5, 0, 0.5, 0] }
+                    : { scaleY: 0.45, y: 0 }
+                }
+                transition={
+                  isSpeaking
+                    ? { duration: 0.38, repeat: Infinity, ease: "easeInOut" }
+                    : { duration: 0.12 }
+                }
+              />
+            </div>
+          </motion.div>
           <button
             type="button"
             onClick={giveCandy}
