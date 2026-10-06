@@ -10,3 +10,4 @@
 <!-- LOVABLE:END -->
 
 - Use Framer Motion for PookieDoll's visible motion states and face overlays because those animations need synchronized spring transitions.
+- Serve branding images from lowercase PNG files in public using absolute root paths so references remain portable across production hosts.
