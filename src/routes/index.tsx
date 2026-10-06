@@ -11,7 +11,6 @@ import {
   Zap,
   Lock,
 } from "lucide-react";
-import logoAsset from "../assets/aeropdf-logo.png.asset.json";
 import { PinkBubbleCanvas } from "@/components/PinkBubbleCanvas";
 import { PookieDoll } from "@/components/PookieDoll";
 import {
@@ -247,7 +246,7 @@ function AeroPDFStudio() {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
         <div className="flex items-center gap-3">
           <img
-            src={logoAsset.url}
+            src="/logo.png"
             alt="PookiePDF Studio logo"
             className="h-12 w-12 object-contain [filter:drop-shadow(0px_8px_24px_rgba(247,177,193,0.9))]"
           />
@@ -320,7 +319,7 @@ function AeroPDFStudio() {
             }`}
           >
             <img
-              src={logoAsset.url}
+              src="/document-bow.png"
               alt="PookiePDF document with pink bow"
               className="mb-5 h-20 w-20 object-contain drop-shadow-sm sm:h-24 sm:w-24"
             />
