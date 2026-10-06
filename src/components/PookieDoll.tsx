@@ -13,8 +13,15 @@ const VOICE_LINES = {
   perch: ["Comfy up here!", "Hehe, I'm sitting on the box!", "Wheee, up I go!"],
   ground: ["Boing! Down I go!", "La la la!", "Wiggle wiggle!"],
   wave: ["Hi bubble!", "Ooh, pretty bubble!", "Bubble, come play!"],
-  candy: ["Yummy candy! Thank you!", "Mmm, so sweet!", "Candy! Yay!"],
 };
+
+// Feature-pitch announcements, spoken once on the visitor's first interaction.
+const FEATURE_LINES = [
+  "Hey Pookie! Welcome! Drop your PDF files here, and I will instantly convert them to fully editable Word documents for you!",
+  "Wow, look at all these cool features! Did you know you can merge multiple files, compress heavy PDFs, and convert formats with absolutely zero hosting fees?",
+  "Don't worry about server limits, Pookie! I deliver elite production-ready file conversions right here on our fast cloud network!",
+  "Hi there! PookiePDF Studio can easily handle Word to PDF, image conversions, and document merging in just a few seconds. Try it out!",
+];
 
 const pick = (arr: string[]) => arr[Math.floor(Math.random() * arr.length)] ?? "";
 
@@ -28,7 +35,6 @@ export function PookieDoll() {
   const layerRef = useRef<HTMLDivElement>(null);
   const dollRef = useRef<HTMLDivElement>(null);
   const sparkRef = useRef<HTMLDivElement>(null);
-  const candyRef = useRef<() => void>(() => {});
   const speechIdRef = useRef(0);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isBlinking, setIsBlinking] = useState(false);
@@ -41,7 +47,7 @@ export function PookieDoll() {
     synth.cancel();
 
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.pitch = 2;
+    utterance.pitch = 1.5;
     utterance.rate = 1.1;
     utterance.volume = 0.9;
     const voices = synth.getVoices();
@@ -73,6 +79,27 @@ export function PookieDoll() {
       window.clearTimeout(blinkTimeout);
     };
   }, []);
+
+  // One-shot feature announcement on the visitor's first interaction.
+  useEffect(() => {
+    let announced = false;
+    const announce = () => {
+      if (announced) return;
+      announced = true;
+      speak(pick(FEATURE_LINES));
+      window.removeEventListener("pointerdown", announce);
+      window.removeEventListener("keydown", announce);
+      window.removeEventListener("touchstart", announce);
+    };
+    window.addEventListener("pointerdown", announce);
+    window.addEventListener("keydown", announce);
+    window.addEventListener("touchstart", announce, { passive: true });
+    return () => {
+      window.removeEventListener("pointerdown", announce);
+      window.removeEventListener("keydown", announce);
+      window.removeEventListener("touchstart", announce);
+    };
+  }, [speak]);
 
   useEffect(() => {
     const anchor = anchorRef.current;
@@ -125,11 +152,6 @@ export function PookieDoll() {
       tiltVel = 0.55;
     };
 
-    candyRef.current = () => {
-      burst();
-      waveUntil = performance.now() + 900;
-      speak(pick(VOICE_LINES.candy));
-    };
 
     const tick = (now: number) => {
       const w = width();
@@ -223,10 +245,6 @@ export function PookieDoll() {
     };
   }, [speak]);
 
-  const giveCandy = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    candyRef.current();
-  }, []);
 
   return (
     <>
@@ -290,13 +308,6 @@ export function PookieDoll() {
               />
             </div>
           </motion.div>
-          <button
-            type="button"
-            onClick={giveCandy}
-            className="pointer-events-auto absolute -bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border border-border bg-card px-2 py-0.5 text-[10px] font-semibold text-foreground shadow-sm transition-transform hover:scale-105 active:scale-95"
-          >
-            🍬 Give Candy
-          </button>
         </div>
       </div>
     </>
