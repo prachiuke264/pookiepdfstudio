@@ -152,11 +152,6 @@ export function PookieDoll() {
       tiltVel = 0.55;
     };
 
-    candyRef.current = () => {
-      burst();
-      waveUntil = performance.now() + 900;
-      speak(pick(VOICE_LINES.candy));
-    };
 
     const tick = (now: number) => {
       const w = width();
@@ -250,10 +245,6 @@ export function PookieDoll() {
     };
   }, [speak]);
 
-  const giveCandy = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    candyRef.current();
-  }, []);
 
   return (
     <>
@@ -317,13 +308,6 @@ export function PookieDoll() {
               />
             </div>
           </motion.div>
-          <button
-            type="button"
-            onClick={giveCandy}
-            className="pointer-events-auto absolute -bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border border-border bg-card px-2 py-0.5 text-[10px] font-semibold text-foreground shadow-sm transition-transform hover:scale-105 active:scale-95"
-          >
-            🍬 Give Candy
-          </button>
         </div>
       </div>
     </>
