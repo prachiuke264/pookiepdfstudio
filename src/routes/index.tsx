@@ -223,6 +223,7 @@ function AeroPDFStudio() {
         await normalizePdf(files[0]!);
       }
       setDone(true);
+      window.dispatchEvent(new Event("pookie:conversion-complete"));
     } catch {
       setError(
         "We couldn't process that file — it may be password-protected or damaged."
@@ -298,6 +299,7 @@ function AeroPDFStudio() {
             role="button"
             tabIndex={0}
             aria-label={`Upload files for ${activeTool.title}`}
+            data-pookie-upload
             onClick={() => inputRef.current?.click()}
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.key === " ") inputRef.current?.click();
