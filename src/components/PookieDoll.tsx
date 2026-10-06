@@ -14,7 +14,7 @@ const VOICE_LINES = {
   wave: ["Hi bubble!", "Ooh, pretty bubble!", "Bubble, come play!"],
 };
 
-// Feature-pitch announcements, spoken once on the visitor's first interaction.
+// Feature-pitch announcements share the same cooldown as activity speech.
 const FEATURE_LINES = [
   "Hey Pookie! Welcome! Drop your PDF files here, and I will instantly convert them to fully editable Word documents for you!",
   "Wow, look at all these cool features! Did you know you can merge multiple files, compress heavy PDFs, and convert formats with absolutely zero hosting fees?",
@@ -35,35 +35,73 @@ export function PookieDoll() {
   const dollRef = useRef<HTMLDivElement>(null);
   const sparkRef = useRef<HTMLDivElement>(null);
   const speechIdRef = useRef(0);
+  const voiceRef = useRef<SpeechSynthesisVoice | null>(null);
+  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+  const interactionRef = useRef(false);
+  const lastSpeechRef = useRef(-Infinity);
+  const lastFeatureRef = useRef("");
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isBlinking, setIsBlinking] = useState(false);
 
   const speak = useCallback((text: string) => {
     if (typeof window === "undefined" || !("speechSynthesis" in window) || !text) return;
     const synth = window.speechSynthesis;
+    if (!interactionRef.current || utteranceRef.current || synth.speaking || synth.pending ||
+        performance.now() - lastSpeechRef.current < 8000) return;
     const speechId = speechIdRef.current + 1;
     speechIdRef.current = speechId;
-    synth.cancel();
 
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.pitch = 1.5;
-    utterance.rate = 1.1;
+    utterance.pitch = 1.45;
+    utterance.rate = 1.05;
     utterance.volume = 0.9;
-    const voices = synth.getVoices();
-    const female = voices.find((voice) =>
-      /female|samantha|zira|google uk english female|victoria/i.test(voice.name)
-    );
-    if (female) utterance.voice = female;
+    utterance.lang = voiceRef.current?.lang ?? "en-US";
+    if (voiceRef.current) utterance.voice = voiceRef.current;
+    utteranceRef.current = utterance;
+    lastSpeechRef.current = performance.now();
 
     utterance.onstart = () => {
       if (speechIdRef.current === speechId) setIsSpeaking(true);
     };
-    const finish = () => {
+    utterance.onpause = () => {
       if (speechIdRef.current === speechId) setIsSpeaking(false);
+    };
+    utterance.onresume = utterance.onstart;
+    const finish = () => {
+      if (speechIdRef.current !== speechId) return;
+      utteranceRef.current = null;
+      setIsSpeaking(false);
     };
     utterance.onend = finish;
     utterance.onerror = finish;
-    synth.speak(utterance);
+    try {
+      synth.speak(utterance);
+    } catch {
+      finish();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!("speechSynthesis" in window)) return;
+    const synth = window.speechSynthesis;
+    const selectVoice = () => {
+      const voices = synth.getVoices().filter((voice) => /^en(?:-|_)/i.test(voice.lang));
+      voiceRef.current =
+        voices.find((voice) => /^Google US English Female$/i.test(voice.name)) ??
+        voices.find((voice) => /^Google UK English Female$/i.test(voice.name)) ??
+        voices.find((voice) => /^Google UK English(?: Male)?$/i.test(voice.name)) ??
+        voices.find((voice) => /^Google US English$/i.test(voice.name)) ??
+        voices.find((voice) => /female|samantha|zira|victoria/i.test(voice.name)) ??
+        voices.find((voice) => voice.default) ?? voices[0] ?? null;
+    };
+    selectVoice();
+    synth.addEventListener("voiceschanged", selectVoice);
+    return () => {
+      synth.removeEventListener("voiceschanged", selectVoice);
+      speechIdRef.current += 1;
+      if (utteranceRef.current) synth.cancel();
+      utteranceRef.current = null;
+    };
   }, []);
 
   useEffect(() => {
@@ -79,24 +117,30 @@ export function PookieDoll() {
     };
   }, []);
 
-  // One-shot feature announcement on the visitor's first interaction.
+  // Initial gesture unlocks audio; subsequent upload and completion events repeat it.
   useEffect(() => {
-    let announced = false;
     const announce = () => {
-      if (announced) return;
-      announced = true;
-      speak(pick(FEATURE_LINES));
-      window.removeEventListener("pointerdown", announce);
-      window.removeEventListener("keydown", announce);
-      window.removeEventListener("touchstart", announce);
+      const line = pick(FEATURE_LINES.filter((line) => line !== lastFeatureRef.current));
+      speak(line);
+      if (utteranceRef.current?.text === line) lastFeatureRef.current = line;
     };
-    window.addEventListener("pointerdown", announce);
-    window.addEventListener("keydown", announce);
-    window.addEventListener("touchstart", announce, { passive: true });
+    const interact = (event: Event) => {
+      if (event instanceof KeyboardEvent &&
+          (event.repeat || !["Enter", " "].includes(event.key))) return;
+      const firstInteraction = !interactionRef.current;
+      interactionRef.current = true;
+      const target = event.target;
+      if (firstInteraction || (target instanceof Element && target.closest("[data-pookie-upload]"))) {
+        announce();
+      }
+    };
+    window.addEventListener("click", interact);
+    window.addEventListener("keydown", interact);
+    window.addEventListener("pookie:conversion-complete", announce);
     return () => {
-      window.removeEventListener("pointerdown", announce);
-      window.removeEventListener("keydown", announce);
-      window.removeEventListener("touchstart", announce);
+      window.removeEventListener("click", interact);
+      window.removeEventListener("keydown", interact);
+      window.removeEventListener("pookie:conversion-complete", announce);
     };
   }, [speak]);
 
@@ -240,7 +284,6 @@ export function PookieDoll() {
     frame = window.requestAnimationFrame(tick);
     return () => {
       window.cancelAnimationFrame(frame);
-      window.speechSynthesis?.cancel();
     };
   }, [speak]);
 
@@ -268,6 +311,7 @@ export function PookieDoll() {
           />
           <motion.div
             className="relative origin-bottom"
+            data-pookie-speaking={isSpeaking}
             animate={isSpeaking ? { y: [0, -1.5, 0], scale: [1, 1.008, 1] } : { y: 0, scale: 1 }}
             transition={
               isSpeaking
@@ -302,7 +346,7 @@ export function PookieDoll() {
                 transition={
                   isSpeaking
                     ? { duration: 0.38, repeat: Infinity, ease: "easeInOut" }
-                    : { duration: 0.12 }
+                    : { duration: 0 }
                 }
               />
             </div>
