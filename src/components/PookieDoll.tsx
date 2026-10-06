@@ -1,6 +1,5 @@
 import { motion } from "framer-motion";
 import { useCallback, useEffect, useRef, useState } from "react";
-import dollAsset from "@/assets/pookie-doll.png.asset.json";
 
 type Bubble = { x: number; y: number; radius: number };
 type Mode = "perch" | "ground" | "chase" | "return";
@@ -278,7 +277,7 @@ export function PookieDoll() {
           >
             <div ref={dollRef} className="relative origin-bottom">
               <img
-                src={dollAsset.url}
+                src="/pookie-doll.png"
                 alt=""
                 aria-hidden="true"
                 className="relative w-full select-none drop-shadow-[0_10px_18px_rgba(43,37,36,0.18)]"
