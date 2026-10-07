@@ -24,12 +24,20 @@ const FEATURE_LINES = [
 
 const pick = (arr: string[]) => arr[Math.floor(Math.random() * arr.length)] ?? "";
 
+const TOOL_LINES: Record<string, string[]> = {
+  "pdf-to-word": ["Hey Pookie! Drop a PDF here and I'll turn its selectable text into an editable Word document!", "Let's make your PDF text editable! Browse your device and I'll create a Word document for you."],
+  "word-to-pdf": ["Hey Pookie! Upload your Word DOCX document and I'll turn it into a PDF, right here on your device!", "Ready to share your Word document? Drop a DOCX here and let's make a PDF for free!"],
+  "merge-pdf": ["Hey Pookie! Drop two or more PDFs here and I'll merge them in the order you upload them!", "Let's bring your PDFs together! Add your files and I'll make one combined PDF for free."],
+  "compress-pdf": ["Hey Pookie! Upload your PDF, choose a compression level and target size, and I'll help make it smaller!", "Let's lighten that PDF! Choose your target file size and I'll compress it right here on your device."],
+  "image-to-pdf": ["Hey Pookie! Drop your JPG, PNG or WebP images here and I'll combine them into a PDF!"],
+};
+
 /**
  * Interactive doll: perches on the dropzone top-right edge, hops down to the
  * viewport floor, chases bubbles, waves at nearby bubbles, breathes and sways
  * continuously, and speaks short lines when her activity changes.
  */
-export function PookieDoll() {
+export function PookieDoll({ toolId, anchored = false }: { toolId?: string; anchored?: boolean }) {
   const anchorRef = useRef<HTMLSpanElement>(null);
   const layerRef = useRef<HTMLDivElement>(null);
   const dollRef = useRef<HTMLDivElement>(null);
@@ -40,6 +48,8 @@ export function PookieDoll() {
   const interactionRef = useRef(false);
   const lastSpeechRef = useRef(-Infinity);
   const lastFeatureRef = useRef("");
+  const featureLinesRef = useRef(FEATURE_LINES);
+  featureLinesRef.current = toolId ? TOOL_LINES[toolId] ?? FEATURE_LINES : FEATURE_LINES;
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isBlinking, setIsBlinking] = useState(false);
 
@@ -120,7 +130,9 @@ export function PookieDoll() {
   // Initial gesture unlocks audio; subsequent upload and completion events repeat it.
   useEffect(() => {
     const announce = () => {
-      const line = pick(FEATURE_LINES.filter((line) => line !== lastFeatureRef.current));
+      const lines = featureLinesRef.current;
+      const choices = lines.filter((line) => line !== lastFeatureRef.current);
+      const line = pick(choices.length ? choices : lines);
       speak(line);
       if (utteranceRef.current?.text === line) lastFeatureRef.current = line;
     };
@@ -206,7 +218,7 @@ export function PookieDoll() {
       }
 
       // Unpredictable activity cycle every 10–15s.
-      if (!reduceMotion.matches && now >= nextCycle && (mode === "perch" || mode === "ground")) {
+      if (!anchored && !reduceMotion.matches && now >= nextCycle && (mode === "perch" || mode === "ground")) {
         nextCycle = now + 10000 + Math.random() * 5000;
         const r = Math.random();
         if (mode === "ground" && r < 0.5) setMode("perch", VOICE_LINES.perch);
@@ -285,7 +297,7 @@ export function PookieDoll() {
     return () => {
       window.cancelAnimationFrame(frame);
     };
-  }, [speak]);
+  }, [speak, anchored]);
 
 
   return (
