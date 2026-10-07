@@ -1,4 +1,5 @@
-# Voice upgrade
-- [x] Prefer Google English voices and lock voice tuning.
-- [x] Repeat feature announcements on upload interactions and successful conversions with cooldown and no overlap.
-- [x] Synchronize face with speech lifecycle and verify the interaction flow.
+# Multi-page converters
+- [ ] Add four dedicated converter routes with unique metadata, navigation, and sitemap entries.
+- [ ] Share the branded workspace and implement genuine Word document conversions.
+- [ ] Keep Pookie centered with tool-specific speech, existing tuning, and synchronized face.
+- [ ] Verify conversions, route metadata, and page appearance.

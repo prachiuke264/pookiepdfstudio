@@ -12,3 +12,5 @@
 - Use Framer Motion for PookieDoll's visible motion states and face overlays because those animations need synchronized spring transitions.
 - Serve branding images from lowercase PNG files in public using absolute root paths so references remain portable across production hosts.
 - PookieDoll owns browser speech selection, lifecycle, and cooldown; the converter emits a completion event and marks its upload target so file processing remains independent of character audio.
+- Keep TanStack file routes as thin wrappers around the shared ConverterWorkspace; leaf routes own tool metadata and initial tool selection so direct visits and client navigation agree.
+- Load Word conversion packages only inside browser conversion handlers; DOCX import sanitizes document HTML and PDF export runs locally without server credentials.
