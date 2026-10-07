@@ -56,7 +56,7 @@ export const Route = createFileRoute("/")({
     ],
   }),
   validateSearch: (search: Record<string, unknown>): { tool?: "image-to-pdf" } =>
-    search.tool === "image-to-pdf" ? { tool: "image-to-pdf" } : {},
+    search['tool'] === "image-to-pdf" ? { tool: "image-to-pdf" } : {},
   component: HomePage,
 });
 
