@@ -29,10 +29,10 @@ export const TOOLS = [
     id: "pdf-to-word",
     icon: FileText,
     title: "PDF to Word",
-    desc: "Turn any PDF into an editable .docx document in seconds.",
+    desc: "Turn selectable PDF text into an editable .docx document.",
     tag: "Popular",
     workspaceTitle: "PDF to Word Converter",
-    workspaceDesc: "Upload a PDF and get a fully editable Word document back.",
+    workspaceDesc: "Extract selectable PDF text into an editable Word document. Scanned PDFs require OCR.",
     dropText: "Drag & drop your PDF here",
     dropHint: "PDF files up to 100 MB",
     accept: ".pdf",
@@ -340,7 +340,7 @@ export function ConverterWorkspace({ initialTool = "pdf-to-word", dedicated = fa
                       </p>
                     </div>
                   </div>
-                  <Button variant="ghost"
+                  <Button variant="workspace" size="workspace"
                     aria-label={`Remove ${f.name}`}
                     onClick={() => {
                       setFiles((prev) => prev.filter((_, j) => j !== i));
@@ -367,11 +367,11 @@ export function ConverterWorkspace({ initialTool = "pdf-to-word", dedicated = fa
                     { id: "high", label: "High", hint: "Smallest size" },
                   ] as const
                 ).map((opt) => (
-                  <Button variant="ghost"
+                  <Button variant="workspace" size="workspace"
                     key={opt.id}
                     onClick={() => setLevel(opt.id)}
                     aria-pressed={level === opt.id}
-                    className={`rounded-xl border px-4 py-3 text-left transition-all duration-200 hover:scale-[1.02] active:scale-95 ${
+                    className={`block rounded-xl border px-4 py-3 text-left transition-all duration-200 hover:scale-[1.02] active:scale-95 ${
                       level === opt.id
                         ? "border-primary bg-primary/40"
                         : "border-border bg-card hover:border-primary"
@@ -408,7 +408,7 @@ export function ConverterWorkspace({ initialTool = "pdf-to-word", dedicated = fa
                   />
                   <div className="grid shrink-0 grid-cols-2 rounded-lg bg-secondary p-1" aria-label="File size unit">
                     {(["KB", "MB"] as const).map((unit) => (
-                      <Button variant="ghost"
+                      <Button variant="workspace" size="workspace"
                         key={unit}
                         type="button"
                         onClick={() => setTargetUnit(unit)}
@@ -432,7 +432,7 @@ export function ConverterWorkspace({ initialTool = "pdf-to-word", dedicated = fa
           )}
 
           {/* Action */}
-          <Button variant="ghost"
+          <Button variant="workspace" size="workspace"
             onClick={handleConvert}
             disabled={files.length === 0 || converting}
             className="mt-6 w-full rounded-2xl bg-primary px-6 py-4 text-lg font-bold text-primary-foreground shadow-[0_0_35px_-5px_oklch(0.82_0.05_235/0.9)] transition-all duration-200 hover:shadow-[0_0_45px_-5px_oklch(0.82_0.05_235)] hover:brightness-105 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
