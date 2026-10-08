@@ -104,6 +104,7 @@ const ROUTE_PATHS = {
   "word-to-pdf": "/word-to-pdf",
   "merge-pdf": "/merge-pdf",
   "compress-pdf": "/compress-pdf",
+  "image-to-pdf": "/image-to-pdf",
 } as const;
 
 export function ConverterWorkspace({ initialTool = "pdf-to-word", dedicated = false }: { initialTool?: ToolId; dedicated?: boolean }) {
@@ -122,12 +123,8 @@ export function ConverterWorkspace({ initialTool = "pdf-to-word", dedicated = fa
   const workspaceRef = useRef<HTMLElement>(null);
 
   const selectTool = useCallback((tool: (typeof TOOLS)[number]) => {
-    if (tool.id !== "image-to-pdf") {
+    if (dedicated || tool.id !== activeTool.id) {
       void navigate({ to: ROUTE_PATHS[tool.id] });
-      return;
-    }
-    if (dedicated) {
-      void navigate({ to: "/", search: { tool: "image-to-pdf" } });
       return;
     }
     setActiveTool(tool);
@@ -484,9 +481,8 @@ export function ConverterWorkspace({ initialTool = "pdf-to-word", dedicated = fa
             {TOOLS.map((tool) => (
               <Link
                 key={tool.id}
-                to={tool.id === "image-to-pdf" ? "/" : ROUTE_PATHS[tool.id]}
-                search={tool.id === "image-to-pdf" ? { tool: "image-to-pdf" } : {}}
-                onClick={tool.id === "image-to-pdf" && !dedicated ? (event) => { event.preventDefault(); selectTool(tool); } : undefined}
+                to={ROUTE_PATHS[tool.id]}
+                onClick={!dedicated && tool.id === activeTool.id ? (event) => { event.preventDefault(); selectTool(tool); } : undefined}
                 aria-current={activeTool.id === tool.id ? "page" : undefined}
                 className={`group rounded-2xl border p-6 text-left shadow-sm transition-all duration-200 hover:scale-105 hover:shadow-md active:scale-95 ${
                   activeTool.id === tool.id
