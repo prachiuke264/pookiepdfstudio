@@ -14,3 +14,5 @@
 - PookieDoll owns browser speech selection, lifecycle, and cooldown; the converter emits a completion event and marks its upload target so file processing remains independent of character audio.
 - Keep TanStack file routes as thin wrappers around the shared ConverterWorkspace; leaf routes own tool metadata and initial tool selection so direct visits and client navigation agree.
 - Load Word conversion packages only inside browser conversion handlers; DOCX import sanitizes document HTML and PDF export runs locally without server credentials.
+- Render DOCX HTML in an isolated off-screen document before PDF rasterization to avoid application CSS incompatibilities; Word-to-PDF preserves visual content rather than selectable PDF text.
+- Use the Button workspace variant and size for existing converter controls so design-system adoption preserves their established dimensions and appearance.
