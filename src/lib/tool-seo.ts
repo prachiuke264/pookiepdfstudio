@@ -1,8 +1,6 @@
 const BASE_URL = "https://pookiepdfstudio.lovable.app";
 
-export function toolHead(path: string, name: string, action: string) {
-  const title = `${name} - 100% Free Online | PookiePDF Studio`;
-  const description = `${action} with PookiePDF Studio. No signup, no ads, completely unlimited file conversion. Free online tools with files processed on your device.`;
+export function toolHead(path: string, title: string, description: string) {
   return {
     meta: [
       { title },
@@ -17,7 +15,7 @@ export function toolHead(path: string, name: string, action: string) {
     ],
     links: [{ rel: "canonical", href: BASE_URL + path }],
     scripts: [{ type: "application/ld+json", children: JSON.stringify({
-      "@context": "https://schema.org", "@type": "WebApplication", name,
+      "@context": "https://schema.org", "@type": "WebApplication", name: title,
       url: BASE_URL + path, applicationCategory: "UtilityApplication", operatingSystem: "Web",
       offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
     }) }],

@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CompressPdfRouteImport } from './routes/compress-pdf'
+import { Route as ImageToPdfRouteImport } from './routes/image-to-pdf'
 import { Route as MergePdfRouteImport } from './routes/merge-pdf'
 import { Route as PdfToWordRouteImport } from './routes/pdf-to-word'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
@@ -24,6 +25,11 @@ const IndexRoute = IndexRouteImport.update({
 const CompressPdfRoute = CompressPdfRouteImport.update({
   id: '/compress-pdf',
   path: '/compress-pdf',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ImageToPdfRoute = ImageToPdfRouteImport.update({
+  id: '/image-to-pdf',
+  path: '/image-to-pdf',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MergePdfRoute = MergePdfRouteImport.update({
@@ -50,6 +56,7 @@ const WordToPdfRoute = WordToPdfRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/compress-pdf': typeof CompressPdfRoute
+  '/image-to-pdf': typeof ImageToPdfRoute
   '/merge-pdf': typeof MergePdfRoute
   '/pdf-to-word': typeof PdfToWordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -58,6 +65,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/compress-pdf': typeof CompressPdfRoute
+  '/image-to-pdf': typeof ImageToPdfRoute
   '/merge-pdf': typeof MergePdfRoute
   '/pdf-to-word': typeof PdfToWordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -67,6 +75,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/compress-pdf': typeof CompressPdfRoute
+  '/image-to-pdf': typeof ImageToPdfRoute
   '/merge-pdf': typeof MergePdfRoute
   '/pdf-to-word': typeof PdfToWordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -77,6 +86,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/compress-pdf'
+    | '/image-to-pdf'
     | '/merge-pdf'
     | '/pdf-to-word'
     | '/sitemap.xml'
@@ -85,6 +95,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/compress-pdf'
+    | '/image-to-pdf'
     | '/merge-pdf'
     | '/pdf-to-word'
     | '/sitemap.xml'
@@ -93,6 +104,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/compress-pdf'
+    | '/image-to-pdf'
     | '/merge-pdf'
     | '/pdf-to-word'
     | '/sitemap.xml'
@@ -102,6 +114,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CompressPdfRoute: typeof CompressPdfRoute
+  ImageToPdfRoute: typeof ImageToPdfRoute
   MergePdfRoute: typeof MergePdfRoute
   PdfToWordRoute: typeof PdfToWordRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -122,6 +135,13 @@ declare module '@tanstack/react-router' {
       path: '/compress-pdf'
       fullPath: '/compress-pdf'
       preLoaderRoute: typeof CompressPdfRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/image-to-pdf': {
+      id: '/image-to-pdf'
+      path: '/image-to-pdf'
+      fullPath: '/image-to-pdf'
+      preLoaderRoute: typeof ImageToPdfRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/merge-pdf': {
@@ -158,6 +178,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CompressPdfRoute: CompressPdfRoute,
+  ImageToPdfRoute: ImageToPdfRoute,
   MergePdfRoute: MergePdfRoute,
   PdfToWordRoute: PdfToWordRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
