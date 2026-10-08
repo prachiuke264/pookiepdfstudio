@@ -23,7 +23,7 @@ export const Route = createFileRoute("/sitemap.xml")({
       GET: async () => {
         const entries: SitemapEntry[] = [
           { path: "/", changefreq: "weekly", priority: "1.0" },
-          ...["/pdf-to-word", "/word-to-pdf", "/merge-pdf", "/compress-pdf"].map((path) => ({
+          ...["/pdf-to-word", "/word-to-pdf", "/merge-pdf", "/compress-pdf", "/image-to-pdf"].map((path) => ({
             path, changefreq: "weekly" as const, priority: "0.9",
           })),
         ];

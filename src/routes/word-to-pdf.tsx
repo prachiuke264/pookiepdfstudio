@@ -3,7 +3,7 @@ import { ConverterWorkspace } from "@/components/ConverterWorkspace";
 import { toolHead } from "@/lib/tool-seo";
 
 export const Route = createFileRoute("/word-to-pdf")({
-  head: () => toolHead("/word-to-pdf", "Word to PDF Converter", "Convert Word DOCX documents to PDF online"),
+  head: () => toolHead("/word-to-pdf", "Convert Word to PDF Online Free - Quick & Secure | PookiePDF Studio", "Convert your docx and Word files into professional, shareable PDFs in one click. Fully secure, no email required."),
   component: ToolPage,
 });
 

@@ -3,7 +3,7 @@ import { ConverterWorkspace } from "@/components/ConverterWorkspace";
 import { toolHead } from "@/lib/tool-seo";
 
 export const Route = createFileRoute("/pdf-to-word")({
-  head: () => toolHead("/pdf-to-word", "PDF to Word Converter", "Convert selectable PDF text to editable Word documents"),
+  head: () => toolHead("/pdf-to-word", "Free PDF to Word Converter Online - 100% Free | PookiePDF Studio", "Convert PDF files into fully editable Microsoft Word documents instantly. No sign-up required, no catch."),
   component: ToolPage,
 });
 
